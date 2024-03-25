@@ -1,0 +1,15 @@
+node_modules
+.env
+coverage
+coverage.json
+.vscode
+
+# Hardhat files
+cache
+artifacts
+deployments
+gas_report.txt
+.solhint.json
+
+/contracts/Business/BusinessNFT.sol
+/contracts/Business/BusinessToken.sol

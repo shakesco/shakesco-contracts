@@ -1,0 +1,9 @@
+type Announcement @entity(immutable: true) {
+  id: Bytes!
+  receiver: Bytes! # address
+  amount: BigInt! # uint256
+  tokenAddress: Bytes! # address
+  businessTokenAddress: Bytes! # address
+  pkx: Bytes! # bytes32
+  ciphertext: Bytes! # bytes32
+}

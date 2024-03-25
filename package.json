@@ -1,0 +1,22 @@
+{
+  "devDependencies": {
+    "@account-abstraction/contracts": "^0.6.0",
+    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+    "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers@^0.3.0-beta.13",
+    "@openzeppelin/contracts": "^4.9.2",
+    "ethers": "^5.7.2",
+    "hardhat": "^2.15.0",
+    "hardhat-contract-sizer": "^2.10.0",
+    "hardhat-deploy": "^0.11.31",
+    "hardhat-gas-reporter": "^1.0.9",
+    "solc": "^0.8.21",
+    "solhint": "^3.4.1",
+    "solidity-coverage": "^0.8.2"
+  },
+  "dependencies": {
+    "@chainlink/contracts": "^0.6.1",
+    "@pinata/sdk": "^2.1.0",
+    "@shakesco/private": "^1.0.0",
+    "dotenv": "^16.3.1"
+  }
+}
