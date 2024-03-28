@@ -94,10 +94,13 @@ npx hardhat test
 
 _Here we are going to cover exciting featues built by shakesco._
 
+<div>
 <img alt="Screenshot" height="500" src="assets/IMG_1131.PNG">
 <img alt="Screenshot" height="500" src="assets/IMG_1143.PNG">
 <img alt="Screenshot" height="500" src="assets/IMG_1145.PNG">
 <img alt="Screenshot" height="500" src="assets/Screenshot_20240103-083342.jpg">
+</div>
+
 
 1. Send and receive/request - We have the basic features in every EOA wallet inside the wallet.
 2. Recurring payments on Ethereum - We are excitted about this, you can now perform auto-payments on Ethereum. Check out our [documentation](https://github.com/shakesco/shakesco-automation) on how it works and how you can start to receive auto-payments on Ethereum. 
