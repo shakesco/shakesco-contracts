@@ -1,12 +1,17 @@
 # Shakesco Smartcontracts
 
-Shakesco has built [__Shakespay__](https://shakesco.netlify.app/) an erc4337 smart wallet on Ethereum and Polygon.(Contracts not deployed on Ethereum☹️). No seed phrases, Multi-party Computation(MPC), recurring payments, stealth payments, NFTs and tokens creation(Loyalty program), bound collectibles, built in marketplace and so much more! Our goal is to make Ethereum user-friendly and secure. Join our [__pre-release__](https://twitter.com/shakespay) today and try it out!!!!
-
 - [Shakesco Smartcontracts](#shakesco-smartcontracts)
   - [Contracts](#contracts)
     - [Deploy](#deploy)
     - [Tests](#tests)
     - [Features](#features)
+
+Shakesco has built [__Shakespay__](https://shakesco.netlify.app/) an erc4337 smart wallet on Ethereum and Polygon.(Contracts not deployed on Ethereum☹️). No seed phrases, Multi-party Computation(MPC), recurring payments, stealth payments, NFTs and tokens creation(Loyalty program), bound collectibles, built in marketplace and so much more! Our goal is to make Ethereum user-friendly and secure. Join our [__pre-release__](https://twitter.com/shakespay) today and try it out!!!!
+
+<img alt="Screenshot" height="500" src="assets/IMG_1120.PNG">
+<img alt="Screenshot" height="500" src="assets/Screenshot_20240103-083401.jpg">
+<img alt="Screenshot" height="500" src="assets/IMG_1142.PNG">
+<img alt="Screenshot" height="500" src="assets/Screenshot_20240103-083251.jpg">
 
 ## Contracts
 
@@ -87,6 +92,11 @@ npx hardhat test
 
 _Here we are going to cover exciting featues built by shakesco._
 
+<img alt="Screenshot" height="500" src="assets/IMG_1131.PNG">
+<img alt="Screenshot" height="500" src="assets/IMG_1143.PNG">
+<img alt="Screenshot" height="500" src="assets/IMG_1145.PNG">
+<img alt="Screenshot" height="500" src="assets/Screenshot_20240103-083342.jpg">
+
 1. Send and receive/request - We have the basic features in every EOA wallet inside the wallet.
 2. Recurring payments on Ethereum - We are excitted about this, you can now perform auto-payments on Ethereum. Check out our [documentation](https://github.com/shakesco/shakesco-automation) on how it works and how you can start to receive auto-payments on Ethereum. 
 3. Private transaction - Credit to [umbra](https://github.com/ScopeLift/umbra-protocol/) we use their registry to register keys so that business and users can perform private transactions. Check out our package [shakespay](https://github.com/shakesco/shakesco-private)
@@ -98,3 +108,5 @@ _Here we are going to cover exciting featues built by shakesco._
 
 Join shakespay's initial release [__here__](https://twitter.com/shakespay). ENJOY
 
+
+![](assets/RPReplay_Final1711645932.mov)
