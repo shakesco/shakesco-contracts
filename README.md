@@ -1,9 +1,12 @@
 # Shakesco Smartcontracts
 
+Shakesco has built [__Shakespay__](https://shakesco.netlify.app/) an erc4337 smart wallet on Ethereum and Polygon.(Contracts not deployed on Ethereum☹️). No seed phrases, Multi-party Computation(MPC), recurring payments, stealth payments, NFTs and tokens creation(Loyalty program), bound collectibles, built in marketplace and so much more! Our goal is to make Ethereum user-friendly and secure. Join our [__pre-release__](https://twitter.com/shakespay) today and try it out!!!!
+
 - [Shakesco Smartcontracts](#shakesco-smartcontracts)
   - [Contracts](#contracts)
     - [Deploy](#deploy)
     - [Tests](#tests)
+    - [Features](#features)
 
 ## Contracts
 
@@ -79,4 +82,19 @@ After getting your apikeys:
 ```shell
 npx hardhat test
 ```
+
+### Features
+
+_Here we are going to cover exciting featues built by shakesco._
+
+1. Send and receive/request - We have the basic features in every EOA wallet inside the wallet.
+2. Recurring payments on Ethereum - We are excitted about this, you can now perform auto-payments on Ethereum. Check out our [documentation](https://github.com/shakesco/shakesco-automation) on how it works and how you can start to receive auto-payments on Ethereum. 
+3. Private transaction - Credit to [umbra](https://github.com/ScopeLift/umbra-protocol/) we use their registry to register keys so that business and users can perform private transactions. Check out our package [shakespay](https://github.com/shakesco/shakesco-private)
+4. Send to many - ERC 4337 enables `executeBatch` function. You can send money to multiple people, or even privately send to multiple users.
+5. Loyalty program - Business can deploy their own token or NFT and auction it off to the built in marketplace in the application. They can offer value, like discounted payments, rewards for reaching certain limits etc.
+6. Name service - We developed a built in name service that enables anyone to register for free. Its a demand-based system rather than subscription based. So you can bid on usernames, preserve etc.
+7. Group transaction - perform transactions as a group. Pay, send and add friends and family and enjoy your crypto journey together.
+8. Personal accounts and business account integration - Open a personal account and then a business acount and receive value in both.
+
+Join shakespay's initial release [__here__](https://twitter.com/shakespay). ENJOY
 
