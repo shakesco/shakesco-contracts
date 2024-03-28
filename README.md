@@ -8,10 +8,12 @@
 
 Shakesco has built [__Shakespay__](https://shakesco.netlify.app/) an erc4337 smart wallet on Ethereum and Polygon.(Contracts not deployed on Ethereum☹️). No seed phrases, Multi-party Computation(MPC), recurring payments, stealth payments, NFTs and tokens creation(Loyalty program), bound collectibles, built in marketplace and so much more! Our goal is to make Ethereum user-friendly and secure. Join our [__pre-release__](https://twitter.com/shakespay) today and try it out!!!!
 
+<div>
 <img alt="Screenshot" height="500" src="assets/IMG_1120.PNG">
 <img alt="Screenshot" height="500" src="assets/Screenshot_20240103-083401.jpg">
 <img alt="Screenshot" height="500" src="assets/IMG_1142.PNG">
 <img alt="Screenshot" height="500" src="assets/Screenshot_20240103-083251.jpg">
+</div>
 
 ## Contracts
 
