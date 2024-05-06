@@ -6,18 +6,13 @@
     - [Tests](#tests)
     - [Features](#features)
 
-Shakesco has built [__Shakespay__](https://shakesco.netlify.app/) an erc4337 smart wallet on Ethereum and Polygon.(Contracts not deployed on Ethereum☹️). No seed phrases, Multi-party Computation(MPC), recurring payments, stealth payments, NFTs and tokens creation(Loyalty program), bound collectibles, built in marketplace and so much more! Our goal is to make Ethereum user-friendly and secure. Join our [__pre-release__](https://twitter.com/shakespay) today and try it out!!!!
+Shakesco has built [__Shakespay__](https://shakesco.netlify.app/) an erc4337 smart wallet on Ethereum and Polygon. No seed phrases, Multi-party Computation(MPC), recurring payments, stealth payments, NFTs and tokens creation(Loyalty program), bound collectibles, built in marketplace and so much more! Our goal is to make Ethereum user-friendly and secure. Join our [__pre-release__](https://twitter.com/shakespay) today and try it out!!!!
 
-<div>
-<img alt="Screenshot" height="500" src="assets/IMG_1120.PNG">
-<img alt="Screenshot" height="500" src="assets/Screenshot_20240103-083401.jpg">
-<img alt="Screenshot" height="500" src="assets/IMG_1142.PNG">
-<img alt="Screenshot" height="500" src="assets/Screenshot_20240103-083251.jpg">
-</div>
+<img alt="Screenshot" height="500" src="assets/seeme.PNG">
 
 ## Contracts
 
-_Some contracts have not been open-sourced. This will be done in the coming weeks. Contracts are not available on Ethereum. This will also change in the coming weeks._
+_Some contracts have not been open-sourced. This will be done in the coming weeks._
 
 Here are the contracts addresses on Polygon:
   1. "FromShakesco.sol": "0x8BAF64Fc6b665cA46D0B5E4Eea81273e774E8f4c",
@@ -35,6 +30,14 @@ Here are the contracts addresses on Polygon:
   13. "Private": "0xc6e8b3a1938502e72080cBb288F30779bd795d43",
   14. "Register automation": "0x269d50b6d6770f1C21Da2bA205bC6609a61B5aC4",
   15. "Group Factory": "0x71F60c2bc1496ba21c2d3955C77E7796e439B778"
+  
+Here are the contracts addresses on Ethereum(Once that are not similar to Polygon):
+  1. "FromShakesco.sol": "0x55ba8D9806583606504BDAc0A4ec66a1D88D1619",
+  2. "Delegate Factory": "0xDF10e393Eb0d6eFa6Ede918e35B817526910057C",
+  3.  "Business Delegate Factory": "0x0E1961711970ae0CfAfD55a6505a7796E8edb6c0",
+  4.  "Business Autopayment Factory": "0xaca39669bEBf65C934bEeb84ecD1bD842E6Bd3cf",
+  5.  "Register automation": "0xd56B608486bCd93218D0c0f399a7f21f583A099e",
+  6.  "Group Factory": "0x71F60c2bc1496ba21c2d3955C77E7796e439B778"
 
 We have 6 folders that hold the main logic:
 
