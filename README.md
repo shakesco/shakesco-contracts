@@ -85,9 +85,9 @@ npx hardhat deploy --network <network of choice>
 Test had to be done in two ways to save cost:
 
 - Tests done locally that don't require userop
-- Test on useop have been done with [__Stackup__](https://docs.stackup.sh/docs "StackupAPI")
+- Test on useop have been done with [__Biconomy__](https://docs.biconomy.io/dashboard "BiconomyAPI")
   
-> 💡Tip: For this section you need api keys from either [__Alchemy__](https://www.alchemy.com/learn/account-abstraction "AlchemyAA") or [__StackUp__](https://docs.stackup.sh/docs "StackUpAA"). We recommend Stackup.
+> 💡Tip: For this section you need api keys from either [__Alchemy__](https://www.alchemy.com/learn/account-abstraction "AlchemyAA") or [__Biconomy__](https://docs.biconomy.io/dashboard "BiconomyAPI"). We recommend Stackup.
 
 After getting your apikeys:
 
