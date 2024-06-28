@@ -15,6 +15,7 @@ contract ShakescoRegisterAutomation {
     LinkTokenInterface private linkToken;
     AutomationRegistryBaseInterface private s_registry;
     KeeperRegistrarInterface private s_registrar;
+    mapping(address => uint256) private s_idToAddress;
     address payable private owner;
 
     modifier onlyOwner() {
@@ -61,14 +62,14 @@ contract ShakescoRegisterAutomation {
         uint256 upkeepId = s_registrar.registerUpkeep(requestParams);
         if (upkeepId != 0) {
             ids.push(upkeepId);
+            s_idToAddress[msg.sender] = upkeepId;
         } else {
             revert("auto-approve disabled");
         }
     }
 
-    function fundIds() external onlyOwner {
+    function fundIds(uint balance) external onlyOwner {
         uint len = ids.length;
-        uint256 balance = linkToken.balanceOf(address(this));
         linkToken.approve(address(s_registry), balance);
         for (uint256 i = 0; i < len; ) {
             uint96 bal = s_registry.getUpkeep(ids[i]).balance;
@@ -81,23 +82,23 @@ contract ShakescoRegisterAutomation {
         }
     }
 
-    function cancelId(uint256 id) external onlyOwner {
+    function cancelId(uint256 id) external {
         s_registry.cancelUpkeep(id);
     }
 
-    function pauseId(uint256 id) external onlyOwner {
+    function pauseId(uint256 id) external {
         s_registry.pauseUpkeep(id);
     }
 
-    function unPauseId(uint256 id) external onlyOwner {
+    function unPauseId(uint256 id) external {
         s_registry.unpauseUpkeep(id);
     }
 
-    function editGasLimit(uint256 id, uint32 gasLimit) external onlyOwner {
+    function editGasLimit(uint256 id, uint32 gasLimit) external {
         s_registry.setUpkeepGasLimit(id, gasLimit);
     }
 
-    function changeAdmin(address proposed, uint256 id) external onlyOwner {
+    function changeAdmin(address proposed, uint256 id) external {
         s_registry.transferUpkeepAdmin(id, proposed);
     }
 
@@ -107,5 +108,22 @@ contract ShakescoRegisterAutomation {
 
     function changeRegistrar(address registrar) external onlyOwner {
         s_registrar = KeeperRegistrarInterface(registrar);
+    }
+
+    function getIds() external view returns (uint256[] memory) {
+        return ids;
+    }
+
+    function getIdByAddress(address caller) external view returns (uint256) {
+        return s_idToAddress[caller];
+    }
+
+    function getBalanceById(address caller) external view returns (uint256) {
+        return s_registry.getUpkeep(s_idToAddress[caller]).balance;
+    }
+
+    function fundById(uint96 bal) external {
+        linkToken.approve(address(s_registry), bal);
+        s_registry.addFunds(s_idToAddress[msg.sender], bal);
     }
 }

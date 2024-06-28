@@ -15,29 +15,31 @@ Shakesco has built [__Shakespay__](https://shakesco.netlify.app/) an erc4337 sma
 _Some contracts have not been open-sourced. This will be done in the coming weeks._
 
 Here are the contracts addresses on Polygon:
-  1. "FromShakesco.sol": "0x8BAF64Fc6b665cA46D0B5E4Eea81273e774E8f4c",
-  2. "Account Factory": "0x12ea9e146902cBc0cbd6A205Dd99f88b3dbD321a",
-  3. "Savings Factory": "0x00cebBCb1D599F7cDd4e429840E6d36f7b10f471",
-  4. "Business Factory": "0x59D6951f45C89fC0f75294AE0D1823fF650621E1",
-  5. "Business Token Factory": "0x28413C4618b7fD2d784BEBca21F6995085cacF53",
-  6. "Business NFT Factory": "0xFddd49B619043fd2bB4C249f17DD28312A574713",
-  7. "Business Saving Factory": "0x1beBa8543d6F9Fae233c0880f340A99e54c85E14",
-  8. "Delegate Factory": "0x6d4A329eD234365ee49A9e1Dc6c31189606AA320",
-  9. "Autopayment Factory": "0x8baBaa1D19859c5Dd615b4E49477601b2d133b45",
-  10. "Business Delegate Factory": "0x8CA9Fe115Ea3BC5697475fB737871104282cc261",
-  11. "Business Autopayment Factory": "0xaca39669bEBf65C934bEeb84ecD1bD842E6Bd3cf",
-  12. "Username": "0x05CD28296aB1Df157667F8aB265D3A2ec187F82B",
-  13. "Private": "0xc6e8b3a1938502e72080cBb288F30779bd795d43",
-  14. "Register automation": "0x269d50b6d6770f1C21Da2bA205bC6609a61B5aC4",
+  1. "FromShakesco.sol": "0x403302B37D2C29CA37f0b0BbCf1591F2dc2E7d22"
+  2. "Account Factory": "0x12ea9e146902cBc0cbd6A205Dd99f88b3dbD321a"
+  3. "Savings Factory": "0x00cebBCb1D599F7cDd4e429840E6d36f7b10f471"
+  4. "Business Factory": "0x59D6951f45C89fC0f75294AE0D1823fF650621E1"
+  5. "Business Token Factory": "0x28413C4618b7fD2d784BEBca21F6995085cacF53"
+  6. "Business NFT Factory": "0xFddd49B619043fd2bB4C249f17DD28312A574713"
+  7. "Business Saving Factory": "0x1beBa8543d6F9Fae233c0880f340A99e54c85E14"
+  8. "Delegate Factory": "0x6B2346AA0750F48B442EB3400F54793D7e381cEd"
+  9. "Autopayment Factory": "0xbDd2647578712159Cb60cf57618d7B0ff99832f8"
+  10. "Business Delegate Factory": "0xFa542278Bf05fa1882cA7cd15Db0b1930D31fED4"
+  11. "Business Autopayment Factory": "0x99350E4F5e934c7b66DE2D0B0F14Ce3e161f2D00"
+  12. "Username": "0x3D134E5e7B8239AB76478B359092a988e69eE55e"
+  13. "Private": "0x30045daEb3eCea157408C21c318A29d2D9Cf0410"
+  14. "Register automation": "0xF4EA3CFE1470C0739600F4d57dA058d70C9e09c1"
   15. "Group Factory": "0x71F60c2bc1496ba21c2d3955C77E7796e439B778"
+  16. "Swap": "0x59E3509Fa4f5228ea2a582533CC872eb9FB8B00A"
   
 Here are the contracts addresses on Ethereum(Once that are not similar to Polygon):
-  1. "FromShakesco.sol": "0x55ba8D9806583606504BDAc0A4ec66a1D88D1619",
-  2. "Delegate Factory": "0xDF10e393Eb0d6eFa6Ede918e35B817526910057C",
-  3.  "Business Delegate Factory": "0x0E1961711970ae0CfAfD55a6505a7796E8edb6c0",
-  4.  "Business Autopayment Factory": "0xaca39669bEBf65C934bEeb84ecD1bD842E6Bd3cf",
-  5.  "Register automation": "0xd56B608486bCd93218D0c0f399a7f21f583A099e",
-  6.  "Group Factory": "0x71F60c2bc1496ba21c2d3955C77E7796e439B778"
+  1. "FromShakesco.sol": "0x55ba8D9806583606504BDAc0A4ec66a1D88D1619"
+  2. "Delegate Factory": "0x74A373011D0E7068F1C71aceE4e9dA23E1628a0c"
+  3.  "Business Delegate Factory": "0x002E401b8BAC832AdF3686D5394D22B937C80d9E"
+  4.  "Business Autopayment Factory": "0xaca39669bEBf65C934bEeb84ecD1bD842E6Bd3cf"
+  5.  "Register automation": "0x9FD92917d2AE4d766b54cc103E0A4f38688F27A7"
+  6.  "Group Factory": "0xE859d17685Bf0D56F2b112ff7d0FCe2276E85545"
+  7.  "Swap": 0xa6E9774BF73753D8d019895Ec94E33F19A02d28b
 
 We have 6 folders that hold the main logic:
 
