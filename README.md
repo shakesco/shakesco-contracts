@@ -33,9 +33,9 @@ Here are the contracts addresses on Polygon:
   
 Here are the contracts addresses on Ethereum(Once that are not similar to Polygon):
 
-  1. "FromShakesco.sol": "0x55ba8D9806583606504BDAc0A4ec66a1D88D1619"
-  2. "Delegate Factory": "0x74A373011D0E7068F1C71aceE4e9dA23E1628a0c"
-  3. "Business Delegate Factory": "0x002E401b8BAC832AdF3686D5394D22B937C80d9E"
+  1. "FromShakesco.sol": "0x4CF0FB9086c63f0273997be5cB1275ebB123773F"
+  2. "Delegate Factory": "0xdeBC6094634F4f75dF903abB5808d13dd8A68AEf"
+  3. "Business Delegate Factory": "0x639A2b02159e78d1f033fEF8A488C9c5052eF2c0"
   4. "Business Autopayment Factory": "0xaca39669bEBf65C934bEeb84ecD1bD842E6Bd3cf"
   5. "Register automation": "0x9FD92917d2AE4d766b54cc103E0A4f38688F27A7"
   6. "Group Factory": "0xE859d17685Bf0D56F2b112ff7d0FCe2276E85545"
