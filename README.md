@@ -6,7 +6,7 @@
     - [Tests](#tests)
     - [Features](#features)
 
-Shakesco has built [__Shakespay__](https://shakesco.com/) an [ERC-4337](https://eips.ethereum.org/EIPS/eip-4337) smart wallet on Ethereum and Polygon. No seed phrases, Multi-party Computation(MPC), recurring payments, stealth payments, NFTs and tokens creation(Loyalty program), bound collectibles, built in marketplace and so much more! Our goal is to make Ethereum user-friendly and secure.
+Shakesco has built [__Shakesco__](https://shakesco.com/) an [ERC-4337](https://eips.ethereum.org/EIPS/eip-4337) smart wallet on Ethereum and Polygon. No seed phrases, Multi-party Computation(MPC), recurring payments, stealth payments, NFTs and tokens creation(Loyalty program), bound collectibles, built in marketplace and so much more! Our goal is to make Ethereum user-friendly and secure.
 
 ## Contracts
 
