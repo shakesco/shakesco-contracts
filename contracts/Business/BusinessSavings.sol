@@ -21,11 +21,20 @@ error BUSINESSSAVINGS__CANNOTRESET();
 using PriceConverter for uint256;
 
 contract ShakescoBusinessSavings is UUPSUpgradeable, Initializable {
+    //Amount they will need to reach so as to withdraw
     uint256 private s_amountToReach;
+    //Time period for saving
     uint256 private s_timePeriod;
+    //Last timestamp saved
     uint256 private s_lastTimeStamp;
+    //Able to reset after withdrawal
     bool private s_canreset;
+    //Their account contract which will call these functions
     ShakescoBusinessContract businessAccount;
+    //Price feed(Mapping of address to price feed)
+    mapping(address => address) private s_priceFeedAddresses;
+    //addresss of tokens supported
+    address[] private s_supportedTokens;
 
     //events
     event FundsMoved(
@@ -92,41 +101,95 @@ contract ShakescoBusinessSavings is UUPSUpgradeable, Initializable {
 
     function sendToBusiness(
         uint256 amount,
-        address nativepriceAddress
+        address nativepriceAddress,
+        address withdrawToken,
+        bool urgent
     ) external onlyOwner {
-        AggregatorV3Interface nativepricefeed = AggregatorV3Interface(
-            nativepriceAddress
-        );
-        uint nativeBalance = address(this).balance.getConvertionRate(
-            nativepricefeed
-        );
+        if (!urgent) {
+            AggregatorV3Interface nativepricefeed = AggregatorV3Interface(
+                nativepriceAddress
+            );
+            uint nativeBalance = address(this).balance.getConvertionRate(
+                nativepricefeed
+            );
 
-        bool checkTime = true;
+            uint len = s_supportedTokens.length;
 
-        if (!s_canreset) {
-            if (nativeBalance < s_amountToReach) {
+            for (uint i = 0; i < len; ) {
+                address tokenAddress = s_supportedTokens[i];
+                address feedAddress = s_priceFeedAddresses[tokenAddress];
+                AggregatorV3Interface tokenpricefeed = AggregatorV3Interface(
+                    feedAddress
+                );
+                uint bal = IERC20(tokenAddress).balanceOf(address(this));
+                nativeBalance += bal.getConvertionRate(tokenpricefeed);
+                unchecked {
+                    ++i;
+                }
+            }
+
+            bool checkTime = true;
+
+            if (!s_canreset) {
+                if (nativeBalance < s_amountToReach) {
+                    revert BUSINESSSAVING__TARGETNOTMET();
+                }
+                checkTime = false;
+            }
+
+            if (s_canreset) checkTime = false;
+
+            if (
+                (block.timestamp - s_lastTimeStamp) < s_timePeriod && checkTime
+            ) {
                 revert BUSINESSSAVING__TARGETNOTMET();
             }
-            checkTime = false;
         }
 
-        if (s_canreset) checkTime = false;
-
-        if ((block.timestamp - s_lastTimeStamp) < s_timePeriod && checkTime) {
-            revert BUSINESSSAVING__TARGETNOTMET();
+        if (!s_canreset) {
+            s_canreset = true;
         }
 
-        s_canreset = true;
+        if (withdrawToken != address(0)) {
+            bool success = IERC20(withdrawToken).transfer(
+                address(businessAccount),
+                amount
+            );
 
-        (bool success, ) = payable(address(businessAccount)).call{
-            value: amount
-        }("");
+            if (!success) {
+                revert BUSINESSSAVING__TRANSACTIONFAILED();
+            }
+        } else {
+            (bool success, ) = payable(address(businessAccount)).call{
+                value: amount
+            }("");
 
-        if (!success) {
-            revert BUSINESSSAVING__TRANSACTIONFAILED();
+            if (!success) {
+                revert BUSINESSSAVING__TRANSACTIONFAILED();
+            }
         }
 
         emit FundsMoved(address(businessAccount), amount, address(this));
+    }
+
+    /**
+     * This function is called when a business whats to add a token address to the assets they are saving
+     * @param token Token address
+     * @param priceFeed Price feed address of the token
+     */
+
+    function addSupportedTokens(
+        address[] calldata token,
+        address[] calldata priceFeed
+    ) external onlyOwner {
+        uint len = token.length;
+        for (uint i = 0; i < len; ) {
+            addToken(token[i]);
+            s_priceFeedAddresses[token[i]] = priceFeed[i];
+            unchecked {
+                ++i;
+            }
+        }
     }
 
     /**
@@ -165,5 +228,38 @@ contract ShakescoBusinessSavings is UUPSUpgradeable, Initializable {
 
     function canResetAndWithdraw() external view returns (bool) {
         return s_canreset;
+    }
+
+    function priceFeedOfToken(address token) external view returns (address) {
+        return s_priceFeedAddresses[token];
+    }
+
+    function supportedTokens() external view returns (address[] memory) {
+        return s_supportedTokens;
+    }
+
+    function version() external pure returns (uint) {
+        return 2;
+    }
+
+    function addToken(address token) private {
+        bool found = false;
+        uint len = s_supportedTokens.length;
+        for (uint i = 0; i < len; ) {
+            if (s_supportedTokens[i] == token) {
+                found = true;
+                break;
+            }
+            if (!found && i == (s_supportedTokens.length - 1)) {
+                s_supportedTokens.push(token);
+            }
+            unchecked {
+                ++i;
+            }
+        }
+
+        if (s_supportedTokens.length == 0) {
+            s_supportedTokens.push(token);
+        }
     }
 }
