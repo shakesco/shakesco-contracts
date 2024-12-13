@@ -19,7 +19,7 @@ Here are the contracts addresses on Polygon:
   3. "Savings Factory": "0x00cebBCb1D599F7cDd4e429840E6d36f7b10f471"
   4. "Business Factory": "0x59D6951f45C89fC0f75294AE0D1823fF650621E1"
   5. "Business Token Factory": "0xAA5f01021CEe18A5dB1485ffC9D2CB3b823d0Dd7"
-  6. "Business NFT Factory": "0x3Bac6F15629cBB10A5Deaae64a896fb0DFA7CD5C"
+  6. "Business NFT Factory": "0x02A92c995c042eD9d2376E293233864e59B4322F"
   7. "Business Saving Factory": "0x1beBa8543d6F9Fae233c0880f340A99e54c85E14"
   8. "Delegate Factory": "0x19c74cfCD60297b4ae2c788FC74cF6B12aa27E5f"
   9. "Autopayment Factory": "0xbDd2647578712159Cb60cf57618d7B0ff99832f8"
