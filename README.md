@@ -26,7 +26,7 @@ Here are the contracts addresses on Polygon:
   10. "Business Delegate Factory": "0xF9f3b28Ea1337eeF11943ee775161D7C109c4335"
   11. "Business Autopayment Factory": "0xa68Bc9Ce674692d94362A4567FE0Ca49408227BE"
   12. "Username": "0x3D134E5e7B8239AB76478B359092a988e69eE55e"
-  13. "Private": "0x30045daEb3eCea157408C21c318A29d2D9Cf0410"
+  13. "Private": "0x6238040aCf8daB04Cc26455934a9364e9Df2B950"
   14. "Register automation": "0xF4EA3CFE1470C0739600F4d57dA058d70C9e09c1"
   15. "Group Factory": "0x71F60c2bc1496ba21c2d3955C77E7796e439B778"
   16. "Swap": "0x59E3509Fa4f5228ea2a582533CC872eb9FB8B00A"
@@ -40,6 +40,17 @@ Here are the contracts addresses on Ethereum(Once that are not similar to Polygo
   5. "Register automation": "0x9FD92917d2AE4d766b54cc103E0A4f38688F27A7"
   6. "Group Factory": "0xE859d17685Bf0D56F2b112ff7d0FCe2276E85545"
   7. "Swap": 0xa6E9774BF73753D8d019895Ec94E33F19A02d28b
+
+Here are the contracts addresses on Base:
+  1. "Account": "0x12ea9e146902cBc0cbd6A205Dd99f88b3dbD321a",
+  2. "ACCOUNTUPGRADE": "0xE569781c018579859d69713510A4532bE91aDC37",
+  3. "Business": "0x59D6951f45C89fC0f75294AE0D1823fF650621E1",
+  4. "BUSINESSUPDATE": "0xF55C7594Ea8C7E442B93eF43a5c1eCEec1630316",
+  5. "Token": "0x2C24cD31006d8195320F9ebb711fF3933D06202F",
+  6. "NFT": "0xf290E4E8155E97D9c8f19705C632b2beAdb19A0D",
+  7. "private": "0x6238040aCf8daB04Cc26455934a9364e9Df2B950",
+  8. "stealth": "0xe18e9DF923aa82C3D7B593d657a653DBcc79B6e3",
+  
 
 We have 6 folders that hold the main logic:
 
