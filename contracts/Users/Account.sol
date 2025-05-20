@@ -2,6 +2,7 @@
 pragma solidity ^0.8.18;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@account-abstraction/contracts/core/BaseAccount.sol";
@@ -10,9 +11,6 @@ import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "../Shakesco/PriceConverter.sol";
-import "../Business/BusinessToken.sol";
-import "../Business/BusinessNFT.sol";
-import "./Savings.sol";
 
 error ACCOUNT__NOTOWNER();
 error ACCOUNT_TRANSACTIONFAILED();
@@ -146,25 +144,7 @@ contract ShakescoAccount is
         emit AccountInitilized(address(s_entryPoint), i_accountOwner);
     }
 
-    /**
-     * @dev Receive tokens and native asset from other users.
-     * @dev The functions also checks if owner wants to autosave if
-     * @dev so it send part of what is receives from native asset
-     * @dev to the saving address(NOTE: NOT TOKENS BUT NATIVE ASSET).
-     */
-
-    receive() external payable {
-        uint256 amountToSave;
-
-        if (s_canAutoSave) {
-            amountToSave = msg.value.mul(s_autoSavingPercent).div(100);
-            (bool success, ) = savingsAddress.call{value: amountToSave}("");
-            if (!success) {
-                emit AutoSaveFailed("AutoSaving Failed!");
-            }
-            emit AutoSaved(amountToSave, s_autoSavingPercent, address(this));
-        }
-    }
+    receive() external payable {}
 
     /**
      * @notice Execute operation
@@ -208,66 +188,6 @@ contract ShakescoAccount is
                 _call(_to[i], _amount[i], func[i]);
             }
         }
-    }
-
-    /// @dev Functions below are only callable by this contract which will be
-    ///      validated later if the owner of the contract called the function or
-    ///      functions if executebatch.
-
-    /**
-     * @notice The following function serves as a way for users to send money to business
-     * @dev We have special functionality that may not apply to sending to another user
-     * @dev The following function only cares about the businessToken the user has.
-     * We minus the amount of token the user has plus the NFTDiscount that the nft carries
-     * from the amount the user is supposed to send
-     * @dev The NFTDISCOUNT and businessTokenBalance can however be greater than amount causing an
-     * underflow and thats bad. We therefore need to take care of this without using safeMath as that
-     * will also throw an ERROR. We believe the implementation below is better and will not break.
-     * @dev We use priceAddress to convert every aseet/token back to correct format so that owner sends
-     * correct amount
-     * @param _to Business the user wants to send funds to.
-     * @param _businessTokenAddress The Token address of business token that the user owns tokens from.
-     * @param _businessNFTAddress The business nft address that the user owns NFT/SBT
-     * @param _priceAddress The price address of the native asset the owner is paying
-     * @param _amount The pay amount
-     */
-
-    function sendToBusiness(
-        address payable _to,
-        address _businessTokenAddress,
-        address _businessNFTAddress,
-        address _priceAddress,
-        uint256 _amount
-    ) external nonReentrant onlyOwner {
-        uint256 tokenToSend;
-        //if not discount just send pay. No need to perform calculation
-        //which mean more gas especially for ethereum. (Tokens are only
-        //in polygon)
-        if (block.chainid != 1) {
-            if (
-                _businessNFTAddress != address(0) ||
-                _businessTokenAddress != address(0)
-            ) {
-                (_amount, tokenToSend) = getBusinessDiscount(
-                    _businessTokenAddress,
-                    _businessNFTAddress,
-                    _priceAddress,
-                    _amount
-                );
-            }
-        }
-
-        //send both token and amount to send depending on discount
-        (bool success, ) = _to.call{value: _amount}("");
-        //if not discount or on ethereum chain we just set this to true
-        bool tokenSuccess = _businessTokenAddress != address(0)
-            ? IERC20(_businessTokenAddress).transfer(_to, tokenToSend)
-            : true;
-
-        if (!success || !tokenSuccess) {
-            revert ACCOUNT_TRANSACTIONFAILED();
-        }
-        emit SendBusiness(_to, _amount, tokenToSend);
     }
 
     /// @dev The function below is called when owner are to receive a collectible(NFT/SBT)
@@ -550,109 +470,8 @@ contract ShakescoAccount is
         return s_entryPoint;
     }
 
-    /**
-     * @dev This function will calculate the required pay by owner to
-     *      the payee(business) giving the correct amount after discount.
-     */
-
-    function getBusinessDiscount(
-        address _businessTokenAddress,
-        address _businessNFTAddress,
-        address _priceAddress,
-        uint256 _amount
-    ) private view returns (uint256 amountToSend, uint256 tokenToSend) {
-        //Business token address
-        ShakescoBusinessToken businessToken = ShakescoBusinessToken(
-            _businessTokenAddress
-        );
-        //business nft/sbt address
-        ShakescoBusinessNFT businessNft = ShakescoBusinessNFT(
-            _businessNFTAddress
-        );
-        //Changes amount to send to native currency because discounts are also in native currency
-        AggregatorV3Interface price = AggregatorV3Interface(_priceAddress);
-
-        //Get owner business token balance
-        uint256 businessTokenBalance;
-        //get owner nft/sbt discount if they own the business nft/sbt
-        uint256 NFTSBTDiscount;
-        //convertion to native currency
-        amountToSend = _amount.getConvertionRate(price);
-        //get tokenid
-        uint discount = _businessNFTAddress != address(0)
-            ? businessNft.getDiscount(address(this))
-            : 0;
-
-        if (
-            _businessNFTAddress == address(0) &&
-            _businessTokenAddress != address(0)
-        ) {
-            //if user has token but no nft/sbt
-            NFTSBTDiscount = 0;
-            businessTokenBalance = businessToken.getBuyerBalance(address(this));
-        } else if (
-            _businessTokenAddress == address(0) &&
-            _businessNFTAddress != address(0)
-        ) {
-            //if user has nft/sbt but no token
-            businessTokenBalance == 0;
-            NFTSBTDiscount = discount;
-        } else if (
-            _businessNFTAddress == address(0) &&
-            _businessTokenAddress == address(0)
-        ) {
-            //if user has no nft/sbt and no token
-            businessTokenBalance == 0;
-            NFTSBTDiscount = 0;
-        } else {
-            //if user has both nft/sbt and token
-            businessTokenBalance = businessToken.getBuyerBalance(address(this));
-
-            NFTSBTDiscount = discount;
-        }
-
-        //convert token to currency
-        //Take number of token the user has and then
-        //get how much each token is worth
-        uint256 tokenPrice = _businessTokenAddress != address(0)
-            ? businessToken.getTokenPrice()
-            : 0;
-
-        if (businessTokenBalance > 0) {
-            businessTokenBalance = (tokenPrice * businessTokenBalance) / 1e18;
-        }
-        //NFT already in currency
-
-        //Add token and nft/sbt discount to get the total discount
-        uint256 totalDiscount = businessTokenBalance + NFTSBTDiscount;
-
-        //if discount is greater than amount to send, send amount
-        //is removed and we instead send token. We let nft/sbt discount
-        //take more priority so that we can save tokens for those who
-        //have both discounts
-        if (amountToSend < totalDiscount) {
-            tokenToSend = NFTSBTDiscount >= amountToSend
-                ? 0
-                : (amountToSend - NFTSBTDiscount);
-            amountToSend = 0;
-        } else if (amountToSend > totalDiscount) {
-            //if amount is greater than discount
-            //send all tokens then minus discount from amount to send
-            tokenToSend = businessTokenBalance;
-            amountToSend -= totalDiscount;
-        } else {
-            //if equal send all tokens but not amount to send
-            tokenToSend = businessTokenBalance;
-            amountToSend = 0;
-        }
-
-        //change back from native currency
-        amountToSend = amountToSend.getReverseConvertionRate(price);
-
-        //Don't forget we also need to convert token
-        if (tokenToSend > 0) {
-            tokenToSend = (tokenToSend * 1e18) / tokenPrice;
-        }
+    function version() external pure returns (uint256) {
+        return 3;
     }
 
     function remove(uint _index) private {

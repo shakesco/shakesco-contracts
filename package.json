@@ -17,7 +17,6 @@
     "@chainlink/contracts": "^0.6.1",
     "@pinata/sdk": "^2.1.0",
     "@shakesco/private": "^1.0.0",
-    "@uniswap/v3-periphery": "^1.4.4",
     "dotenv": "^16.3.1"
   }
 }
