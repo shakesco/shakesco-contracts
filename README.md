@@ -18,8 +18,8 @@ Here are the contracts addresses on Polygon:
 2. "Account Factory": "0x12ea9e146902cBc0cbd6A205Dd99f88b3dbD321a"
 3. "Savings Factory": "0x00cebBCb1D599F7cDd4e429840E6d36f7b10f471"
 4. "Business Factory": "0x59D6951f45C89fC0f75294AE0D1823fF650621E1"
-5. "Business Token Factory": "0xAA5f01021CEe18A5dB1485ffC9D2CB3b823d0Dd7"
-6. "Business NFT Factory": "0x02A92c995c042eD9d2376E293233864e59B4322F"
+5. "Business Token Factory": "0x59D86e564E9B1EE2606aF6E752B517C97f9EF633"
+6. "Business NFT Factory": "0x906e2396A2C31dDE60850bD7CebfD74b31cEa079"
 7. "Business Saving Factory": "0x1beBa8543d6F9Fae233c0880f340A99e54c85E14"
 8. "Delegate Factory": "0x19c74cfCD60297b4ae2c788FC74cF6B12aa27E5f"
 9. "Autopayment Factory": "0xbDd2647578712159Cb60cf57618d7B0ff99832f8"
@@ -28,8 +28,6 @@ Here are the contracts addresses on Polygon:
 12. "Username": "0x3D134E5e7B8239AB76478B359092a988e69eE55e"
 13. "Private": "0xBCe3e2b54E1cc2196d2eBea6211F739642A60c7a"
 14. "Register automation": "0xF4EA3CFE1470C0739600F4d57dA058d70C9e09c1"
-15. "Group Factory": "0x71F60c2bc1496ba21c2d3955C77E7796e439B778"
-16. "Swap": "0x59E3509Fa4f5228ea2a582533CC872eb9FB8B00A"
 
 Here are the contracts addresses on Ethereum(Once that are not similar to Polygon):
 
@@ -38,8 +36,6 @@ Here are the contracts addresses on Ethereum(Once that are not similar to Polygo
 3. "Business Delegate Factory": "0x639A2b02159e78d1f033fEF8A488C9c5052eF2c0"
 4. "Business Autopayment Factory": "0xaca39669bEBf65C934bEeb84ecD1bD842E6Bd3cf"
 5. "Register automation": "0x9FD92917d2AE4d766b54cc103E0A4f38688F27A7"
-6. "Group Factory": "0xE859d17685Bf0D56F2b112ff7d0FCe2276E85545"
-7. "Swap": 0xa6E9774BF73753D8d019895Ec94E33F19A02d28b
 
 Here are the contracts addresses on Base:
 
