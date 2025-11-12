@@ -25,14 +25,22 @@ mockOnThisNetworks.includes(network.name)
             to: savingsContract.address,
             value: ethers.utils.parseEther("0.06"),
           });
+
+          await savingsContract.setTokenAddress(
+            token.address,
+            mockContract.address
+          );
+
           await network.provider.send("evm_increaseTime", [
             parseInt((await savingsContract.getTimePeriod()).toString()) + 5,
           ]);
           await network.provider.send("evm_mine", []);
 
           await savingsContract.sendToAccount(
+            mockContract.address,
+            ethers.constants.AddressZero,
             ethers.utils.parseEther("0.04"),
-            mockContract.address
+            false
           );
           const balanceAfrer = await ethers.provider.getBalance(
             savingsContract.address
@@ -59,17 +67,20 @@ mockOnThisNetworks.includes(network.name)
         it("Should not withdraw if target not met", async () => {
           expect(async () => {
             await savingsContract.sendToAccount(
+              mockContract.address,
+              ethers.constants.AddressZero,
               ethers.utils.parseEther("0.5"),
-              "500000000000000000",
-              mockContract.address
+              false
             );
           }).to.be.revertedWith("SAVING__TARGETNOTMET");
         });
         it("should not allow reset if time not passed", async () => {
           expect(async () => {
             await savingsContract.sendToAccount(
+              mockContract.address,
+              ethers.constants.AddressZero,
               "500000000000000000",
-              mockContract.address
+              false
             );
           }).to.be.revertedWith("SAVING__TARGETNOTMET");
         });

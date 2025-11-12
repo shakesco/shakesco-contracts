@@ -7,7 +7,7 @@ mockOnThisNetworks.includes(network.name)
   ? describe("business and account", () => {
       let businessContract,
         deployer,
-        user,
+        savingsContract,
         accounts,
         contractABI,
         accContract,
@@ -26,6 +26,7 @@ mockOnThisNetworks.includes(network.name)
         await deployments.fixture(["all"]);
 
         accContract = await ethers.getContract("ShakescoAccount", deployer);
+        savingsContract = await ethers.getContract("ShakescoSavings", deployer);
 
         businessToken = await ethers.getContract(
           "ShakescoBusinessToken",
@@ -73,7 +74,7 @@ mockOnThisNetworks.includes(network.name)
       });
 
       describe("split pay business", () => {
-        it("should pull if not allowed", async () => {
+        it("should not pull if not allowed", async () => {
           const accountABI = new ethers.utils.Interface(ACCABI.abi);
           const call = accountABI.encodeFunctionData("pullSplitPay", [
             businessContract.address,
@@ -203,6 +204,65 @@ mockOnThisNetworks.includes(network.name)
         });
       });
 
+      describe("new auto save", () => {
+        beforeEach(async () => {
+          await deployer.sendTransaction({
+            to: accContract.address,
+            value: ethers.utils.parseEther("10"),
+          });
+        });
+
+        it("should not auto save if auto save if off", async () => {
+          const accountABI = new ethers.utils.Interface(ACCABI.abi);
+          const calldata = accountABI.encodeFunctionData("receiveAndSave", [
+            ethers.constants.AddressZero,
+            0,
+          ]);
+
+          await accContract.execute(
+            accContract.address,
+            ethers.utils.parseEther("1"),
+            calldata
+          );
+
+          const balance = await ethers.provider.getBalance(
+            savingsContract.address
+          );
+
+          assert.equal(balance.toString(), "0");
+        });
+
+        it("should auto save", async () => {
+          const accountABI = new ethers.utils.Interface(ACCABI.abi);
+          const setcalldata = accountABI.encodeFunctionData(
+            "setSavingsAddress",
+            [savingsContract.address, 5]
+          );
+
+          await accContract.execute(accContract.address, 0, setcalldata);
+
+          const calldata = accountABI.encodeFunctionData("receiveAndSave", [
+            ethers.constants.AddressZero,
+            0,
+          ]);
+
+          await accContract.execute(
+            accContract.address,
+            ethers.utils.parseEther("1"),
+            calldata
+          );
+
+          const balance = await ethers.provider.getBalance(
+            savingsContract.address
+          );
+
+          assert.equal(
+            balance.toString(),
+            ethers.utils.parseEther("0.05").toString()
+          );
+        });
+      });
+
       describe("SendBusiness", () => {
         it("Should send without any nft or token", async () => {
           await deployer.sendTransaction({
@@ -210,20 +270,19 @@ mockOnThisNetworks.includes(network.name)
             value: ethers.utils.parseEther("10"),
           });
 
-          const accountABI = new ethers.utils.Interface(ACCABI.abi);
+          const accountABI = new ethers.utils.Interface(BUSINESSABI.abi);
           const calldata = accountABI.encodeFunctionData("sendToBusiness", [
-            businessContract.address,
             ethers.constants.AddressZero,
             ethers.constants.AddressZero,
             contractABI.address,
-            ethers.utils.parseEther("1"),
           ]);
 
           await accContract.execute(
-            accContract.address,
-            ethers.constants.Zero,
+            businessContract.address,
+            ethers.utils.parseEther("1"),
             calldata
           );
+
           const balance = await ethers.provider.getBalance(
             businessContract.address
           );
@@ -233,15 +292,18 @@ mockOnThisNetworks.includes(network.name)
             ethers.utils.parseEther("1").toString()
           );
         });
+
         it("should send with token discount only", async () => {
           await deployer.sendTransaction({
             to: accContract.address,
             value: ethers.utils.parseEther("10"),
           });
 
-          const accountABI = new ethers.utils.Interface(ACCABI.abi);
+          const accountABI = new ethers.utils.Interface(BUSINESSABI.abi);
           const tokenABI = new ethers.utils.Interface(TOKENABI.abi);
-          const middlecall = tokenABI.encodeFunctionData("buyToken", []);
+          const middlecall = tokenABI.encodeFunctionData("buyToken", [
+            contractABI.address,
+          ]);
 
           await accContract.execute(
             businessToken.address,
@@ -250,17 +312,20 @@ mockOnThisNetworks.includes(network.name)
           );
 
           const calldata = accountABI.encodeFunctionData("sendToBusiness", [
-            businessContract.address,
             businessToken.address,
             ethers.constants.AddressZero,
             contractABI.address,
-            ethers.utils.parseEther("0.07"),
           ]);
 
-          await accContract.execute(
-            accContract.address,
-            ethers.constants.Zero,
-            calldata
+          const midddlecall = tokenABI.encodeFunctionData("approve", [
+            businessContract.address,
+            ethers.utils.parseEther("2"),
+          ]);
+
+          await accContract.executeBatch(
+            [businessToken.address, businessContract.address],
+            [0, ethers.utils.parseEther("0.07")],
+            [midddlecall, calldata]
           );
 
           const balance = await ethers.provider.getBalance(
@@ -275,15 +340,21 @@ mockOnThisNetworks.includes(network.name)
             ethers.utils.parseEther("0.54")
           );
         });
+
         it("should send with nft discount", async () => {
           await deployer.sendTransaction({
             to: accContract.address,
             value: ethers.utils.parseEther("10"),
           });
 
-          const accountABI = new ethers.utils.Interface(ACCABI.abi);
+          const accountABI = new ethers.utils.Interface(BUSINESSABI.abi);
           const nftabi = new ethers.utils.Interface(NFTABI.abi);
-          const middlecall = nftabi.encodeFunctionData("buyNft", [0]);
+          const middlecall = nftabi.encodeFunctionData("buyNft", [
+            0,
+            ethers.constants.AddressZero,
+            contractABI.address,
+            0,
+          ]);
 
           await accContract.execute(
             businessNFT.address,
@@ -292,17 +363,17 @@ mockOnThisNetworks.includes(network.name)
           );
 
           const calldata = accountABI.encodeFunctionData("sendToBusiness", [
-            businessContract.address,
             ethers.constants.AddressZero,
             businessNFT.address,
             contractABI.address,
-            ethers.utils.parseEther("0.07"),
           ]);
+
           await accContract.execute(
-            accContract.address,
-            ethers.constants.Zero,
+            businessContract.address,
+            ethers.utils.parseEther("0.07"),
             calldata
           );
+
           const balance = await ethers.provider.getBalance(
             businessContract.address
           );
@@ -311,123 +382,68 @@ mockOnThisNetworks.includes(network.name)
             ethers.utils.parseEther(`0.04${"2".repeat(16)}`).toString()
           );
         });
-      });
 
-      describe("Send to employee", () => {
-        it("should not send if no employee", async () => {
-          await deployer.sendTransaction({
-            to: businessContract.address,
-            value: ethers.utils.parseEther("10"),
-          });
-
-          const accountABI = new ethers.utils.Interface(BUSINESSABI.abi);
-
-          const calldata = accountABI.encodeFunctionData("sendToEmployees", [
-            accContract.address,
-          ]);
-
-          expect(async () => {
-            await accContract.execute(
-              businessContract.address,
-              ethers.constants.Zero,
-              calldata
-            );
-          }).to.be.revertedWith("ACCOUNT_TRANSACTIONFAILED"); //BUSINESSCONTRACT__CANNOTPAYEMPLOYEE
-        });
-
-        it("should not send to wrong employee", async () => {
-          await deployer.sendTransaction({
-            to: businessContract.address,
-            value: ethers.utils.parseEther("10"),
-          });
+        it("should receive erc20", async () => {
           await deployer.sendTransaction({
             to: accContract.address,
             value: ethers.utils.parseEther("10"),
           });
 
-          const nftabi = new ethers.utils.Interface(NFTABI.abi);
-          const addcall = nftabi.encodeFunctionData("addTeam", [
-            0,
+          await token.transfer(
             accContract.address,
-          ]);
-
-          await businessContract.execute(
-            businessNFT.address,
-            ethers.constants.Zero,
-            addcall
-          );
-
-          const bussabi = new ethers.utils.Interface(BUSINESSABI.abi);
-          const middlecall = bussabi.encodeFunctionData("setPayToEmployee", [
-            5,
-            accContract.address,
-          ]);
-
-          await businessContract.execute(
-            businessContract.address,
-            ethers.constants.Zero,
-            middlecall
+            ethers.utils.parseEther("10")
           );
 
           const accountABI = new ethers.utils.Interface(BUSINESSABI.abi);
-          const calldata = accountABI.encodeFunctionData("sendToEmployees", [
-            deployer.address,
+
+          const tokenABI = new ethers.utils.Interface(TOKENABI.abi);
+          const middlecall = tokenABI.encodeFunctionData("buyToken", [
+            contractABI.address,
           ]);
 
-          expect(async () => {
-            await accContract.execute(
-              businessContract.address,
-              ethers.constants.Zero,
-              calldata
-            );
-          }).to.revertedWith("BUSINESSCONTRACT__NOEMPLOYEE"); //BUSINESSCONTRACT__NOEMPLOYEE
-        });
-
-        it("should send to employee", async () => {
-          await deployer.sendTransaction({
-            to: accContract.address,
-            value: ethers.utils.parseEther("10"),
-          });
-
-          const nftabi = new ethers.utils.Interface(NFTABI.abi);
-          const addcall = nftabi.encodeFunctionData("addTeam", [
-            0,
-            accContract.address,
-          ]);
-
-          await businessContract.execute(
-            businessNFT.address,
-            ethers.constants.Zero,
-            addcall
-          );
-
-          const bussabi = new ethers.utils.Interface(BUSINESSABI.abi);
-          const middlecall = bussabi.encodeFunctionData("setPayToEmployee", [
-            5,
-            businessNFT.address,
-          ]);
-
-          await businessContract.execute(
-            businessContract.address,
-            ethers.constants.Zero,
-            middlecall
-          );
-
-          const accountABI = new ethers.utils.Interface(BUSINESSABI.abi);
-          const calldata = accountABI.encodeFunctionData("sendToEmployees", [
-            accContract.address,
-          ]);
           await accContract.execute(
+            businessToken.address,
+            ethers.utils.parseEther("0.06"),
+            middlecall
+          );
+
+          const calldata = accountABI.encodeFunctionData(
+            "sendERC20ToBusiness",
+            [
+              token.address,
+              businessToken.address,
+              ethers.constants.AddressZero,
+              contractABI.address,
+              ethers.utils.parseEther("0.07"),
+            ]
+          );
+
+          const token2 = new ethers.utils.Interface(TESTTOKENABI.abi);
+
+          const midddlecall = token2.encodeFunctionData("approve", [
             businessContract.address,
             ethers.utils.parseEther("0.07"),
-            calldata
+          ]);
+
+          const midmidcal = tokenABI.encodeFunctionData("approve", [
+            businessContract.address,
+            ethers.utils.parseEther("2"),
+          ]);
+
+          await accContract.executeBatch(
+            [token.address, businessToken.address, businessContract.address],
+            [],
+            [midddlecall, midmidcal, calldata]
           );
-          const balance = await ethers.provider.getBalance(
-            businessContract.address
+
+          const balance = await token.balanceOf(businessContract.address);
+          const tokenbalance = await businessToken.balanceOf(
+            accContract.address
           );
+          assert.equal(balance.toString(), "0");
           assert.equal(
-            balance.toString(),
-            ethers.utils.parseEther("0.0665").toString()
+            tokenbalance.toString(),
+            ethers.utils.parseEther("0.54")
           );
         });
       });
