@@ -2,8 +2,6 @@
 pragma solidity ^0.8.18;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "../Shakesco/PriceConverter.sol";
 
 error PRIVATE__NOTOWNER();
 error PRIVATE__TXFAILED();
@@ -20,8 +18,6 @@ error PRIVATE__NOTENOUGHFUNDS();
         that belong to them.
  * @dev The contract also allows the owner to withdraw fees and change the fee percentage. 
  */
-
-using SafeMath for uint256;
 
 contract ShakescoPrivate is ReentrancyGuard {
     address internal constant ETH_TOKEN_PLACHOLDER =

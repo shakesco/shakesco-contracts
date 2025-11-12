@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.18;
 
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@account-abstraction/contracts/core/BaseAccount.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
@@ -14,9 +12,6 @@ import "../Shakesco/PriceConverter.sol";
 
 error BUSINESSCONTRACT__NOTOWNER();
 error BUSINESSCONTRACT__TRANSACTIONFAILED();
-error BUSINESSCONTRACT__NOTNFTOWNER();
-error BUSINESSCONTRACT__NOEMPLOYEE();
-error BUSINESSCONTRACT__CANNOTPAYEMPLOYEE();
 error BUSINESSCONTRACT__NOTOWNERORENTRYPOINT();
 error BUSINESSCONTRACT__INVALIDLENGTH();
 
@@ -25,7 +20,6 @@ error BUSINESSCONTRACT__INVALIDLENGTH();
 /// @dev This contract works similar to how account works
 /// @dev Only difference is 2 functions(Employee functions).
 
-using SafeMath for uint256;
 using ECDSA for bytes32;
 using PriceConverter for uint256;
 
@@ -62,31 +56,10 @@ contract ShakescoBusinessContract is
     //spending for airdrop
     mapping(address => uint256) private s_spendingOnBusinessForDrop;
 
-    event NFTTransfer(
-        address indexed to,
-        uint256 indexed tokenId,
-        address indexed erc721Address
-    );
-    event SendBusiness(
-        address indexed to,
-        uint256 indexed amountofEth,
-        uint256 indexed amountOfBusiness
-    );
     event FundsMoved(
         address indexed to,
         uint256 indexed amount,
         bytes indexed func
-    );
-    event AutoSaved(
-        uint256 indexed amount,
-        uint256 indexed percent,
-        address indexed thisContract
-    );
-    event AutoSavedFailed(string indexed failed);
-    event SendToEmployee(
-        uint256 indexed amount,
-        address indexed employee,
-        address indexed thisContract
     );
     event BusinessInitialized(
         address indexed _entryPoint,
@@ -105,14 +78,6 @@ contract ShakescoBusinessContract is
     modifier onlyEntryPoint() {
         if (msg.sender != address(s_entryPoint)) {
             revert BUSINESSCONTRACT__NOTOWNERORENTRYPOINT();
-        }
-        _;
-    }
-
-    /// @dev Checks if payment to employee is allowed by business
-    modifier payEmployee() {
-        if (!s_canSendToEmployee) {
-            revert BUSINESSCONTRACT__CANNOTPAYEMPLOYEE();
         }
         _;
     }
@@ -207,6 +172,10 @@ contract ShakescoBusinessContract is
         address payable mySavingsAddress,
         uint256 percent
     ) external onlyOwner {
+        if (percent > 100) {
+            revert BUSINESSCONTRACT__TRANSACTIONFAILED();
+        }
+
         businessSaving = mySavingsAddress;
         s_autoSavingPercent = percent;
         s_canAutoSave = percent > 0 ? true : false;
@@ -218,6 +187,10 @@ contract ShakescoBusinessContract is
      */
 
     function setAutoSaving(uint256 percent) external onlyOwner {
+        if (percent > 100) {
+            revert BUSINESSCONTRACT__TRANSACTIONFAILED();
+        }
+
         s_autoSavingPercent = percent;
         s_canAutoSave = true;
     }
@@ -228,6 +201,39 @@ contract ShakescoBusinessContract is
 
     function removeAutoSaving() external onlyOwner {
         s_canAutoSave = false;
+    }
+
+    /**
+     * @dev The following function will help users to auto save when they receive
+     * ether or token
+     * @param tokenAddress The address of the token received
+     * @param amount The amount received if its token
+     */
+
+    function _autoSaveWhenReceive(
+        address tokenAddress,
+        uint256 amount
+    ) private {
+        uint precisionPercent = s_autoSavingPercent * 100;
+
+        uint256 saveAmount = (amount * precisionPercent) / 10000;
+
+        if (s_canAutoSave && saveAmount > 0) {
+            if (tokenAddress == address(0)) {
+                (bool success, ) = businessSaving.call{value: saveAmount}("");
+                if (!success) {
+                    revert BUSINESSCONTRACT__TRANSACTIONFAILED();
+                }
+            } else {
+                bool success = IERC20(tokenAddress).transfer(
+                    businessSaving,
+                    saveAmount
+                );
+                if (!success) {
+                    revert BUSINESSCONTRACT__TRANSACTIONFAILED();
+                }
+            }
+        }
     }
 
     /**
@@ -251,10 +257,8 @@ contract ShakescoBusinessContract is
         address businessTokenAddress,
         uint256 supposedToSpendToGetTokens
     ) external onlyOwner {
-        if (block.chainid != 1) {
-            s_businessTokenAddress = businessTokenAddress;
-            s_supposedToSpendForTokens = supposedToSpendToGetTokens;
-        }
+        s_businessTokenAddress = businessTokenAddress;
+        s_supposedToSpendForTokens = supposedToSpendToGetTokens;
     }
 
     /**
@@ -264,36 +268,12 @@ contract ShakescoBusinessContract is
     function changeSupposedToSpend(
         uint256 newSupposedToSpend
     ) external onlyOwner {
-        if (block.chainid != 1) {
-            s_supposedToSpendForTokens = newSupposedToSpend;
-        }
+        s_supposedToSpendForTokens = newSupposedToSpend;
     }
 
-    /**
-     * @notice check current account deposit in the entryPoint
-     */
-    function getDeposit() public view returns (uint256) {
-        return entryPoint().balanceOf(address(this));
-    }
-
-    /**
-     * @notice deposit more funds for this account in the entryPoint
-     */
-    function addDeposit() public payable onlyOwner {
-        entryPoint().depositTo{value: msg.value}(address(this));
-    }
-
-    /**
-     * @notice withdraw value from the account's deposit
-     * @param withdrawAddress target to send to
-     * @param amount to withdraw
-     */
-    function withdrawDepositTo(
-        address payable withdrawAddress,
-        uint256 amount
-    ) external onlyOwner {
-        entryPoint().withdrawTo(withdrawAddress, amount);
-    }
+    ////////////////////////////////////////
+    ////////////ERC-4337 FUNCTIONS//////////
+    ////////////////////////////////////////
 
     /**
      * @notice Owner can authorize update
@@ -376,9 +356,7 @@ contract ShakescoBusinessContract is
         return s_autoSavingPercent;
     }
 
-    function getSpentOnBusiness(
-        address spender
-    ) external view returns (uint256) {
+    function getSpentOnBusiness(address spender) public view returns (uint256) {
         return s_spendingOnBusinessForTokens[spender];
     }
 
@@ -388,7 +366,7 @@ contract ShakescoBusinessContract is
         return s_spendingOnBusinessForDrop[spender];
     }
 
-    function getSupposedToSpend() external view returns (uint256) {
+    function getSupposedToSpend() public view returns (uint256) {
         return s_supposedToSpendForTokens;
     }
 
@@ -397,6 +375,6 @@ contract ShakescoBusinessContract is
     }
 
     function version() external pure returns (uint256) {
-        return 3;
+        return 4;
     }
 }

@@ -5,14 +5,11 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "../Shakesco/PriceConverter.sol";
-import "./Account.sol";
 
 error SAVING__TRANSACTIONFAILED();
 error SAVING__NOTOWNER();
 error SAVING__TARGETNOTMET();
-error SAVINGS__ONLYEXECUTE();
 error SAVINGS__CANNOTRESET();
-error SAVINGS__TOKENAVAILABLE();
 
 /// @title Savings Account
 /// @author Shawn Kimtai
@@ -35,25 +32,19 @@ contract ShakescoSavings is UUPSUpgradeable, Initializable {
     //Last timestamp saved
     uint256 private s_lastTimeStamp;
     //Their account contract which will call these functions
-    ShakescoAccount account;
+    address payable private account;
+    //price feed address
+    address private s_tokenPriceFeed;
+    //support dai only for now
+    address private s_supportedToken;
     //Able to reset after withdrawal
     bool private s_canreset;
-    //Price feed(Mapping of address to price feed)
-    mapping(address => address) private s_priceFeedAddresses;
-    //addresss of tokens supported
-    address[] private s_supportedTokens;
 
-    //events
-    event FundsMoved(
-        address indexed to,
-        uint256 indexed amount,
-        address indexed from
-    );
     event SavingsInitilized(address indexed owner);
 
     /// @dev only account can call these functions
     modifier onlyOwner() {
-        if (msg.sender != address(account)) {
+        if (msg.sender != account) {
             revert SAVING__NOTOWNER();
         }
         _;
@@ -92,7 +83,7 @@ contract ShakescoSavings is UUPSUpgradeable, Initializable {
         uint256 amountToReach,
         uint256 timePeriod
     ) internal virtual {
-        account = ShakescoAccount(accountAddress);
+        account = accountAddress;
         s_amountToReach = amountToReach;
         s_canreset = false;
         s_lastTimeStamp = block.timestamp;
@@ -106,37 +97,30 @@ contract ShakescoSavings is UUPSUpgradeable, Initializable {
      * @dev The below function will allow the user to remove funds from saving to the Account.
      * @dev Only the account owner(In the Account contract) should call this function.
      * @param _amount is the amount the account owner wants to send to the Account.
-     * @param nativepriceAddress Price feed address of these chain
+     * @param priceAddress Price feed address of these chain
      */
 
     function sendToAccount(
-        uint256 _amount,
-        address nativepriceAddress,
+        address priceAddress,
         address withdrawToken,
+        uint256 _amount,
         bool urgent
     ) external onlyOwner {
         if (!urgent) {
-            AggregatorV3Interface nativepricefeed = AggregatorV3Interface(
-                nativepriceAddress
+            AggregatorV3Interface nativePricefeed = AggregatorV3Interface(
+                priceAddress
             );
+
             uint nativeBalance = address(this).balance.getConvertionRate(
-                nativepricefeed
+                nativePricefeed
             );
 
-            uint len = s_supportedTokens.length;
+            AggregatorV3Interface tokenpricefeed = AggregatorV3Interface(
+                s_tokenPriceFeed
+            );
 
-            for (uint i = 0; i < len; ) {
-                address tokenAddress = s_supportedTokens[i];
-                address feedAddress = s_priceFeedAddresses[tokenAddress];
-                AggregatorV3Interface tokenpricefeed = AggregatorV3Interface(
-                    feedAddress
-                );
-                uint bal = IERC20(tokenAddress).balanceOf(address(this));
-                nativeBalance += bal.getConvertionRate(tokenpricefeed);
-                unchecked {
-                    ++i;
-                }
-            }
+            uint bal = IERC20(s_supportedToken).balanceOf(address(this));
+            nativeBalance += bal.getConvertionRate(tokenpricefeed);
 
             bool checkTime = true;
 
@@ -164,43 +148,16 @@ contract ShakescoSavings is UUPSUpgradeable, Initializable {
         }
 
         if (withdrawToken != address(0)) {
-            bool success = IERC20(withdrawToken).transfer(
-                address(account),
-                _amount
-            );
+            bool success = IERC20(withdrawToken).transfer(account, _amount);
 
             if (!success) {
                 revert SAVING__TRANSACTIONFAILED();
             }
         } else {
-            (bool success, ) = payable(address(account)).call{value: _amount}(
-                ""
-            );
+            (bool success, ) = account.call{value: _amount}("");
 
             if (!success) {
                 revert SAVING__TRANSACTIONFAILED();
-            }
-        }
-
-        emit FundsMoved(address(account), _amount, address(this));
-    }
-
-    /**
-     * This function is called when a user whats to add a token address to the assets they are saving
-     * @param token Token address
-     * @param priceFeed Price feed address of the token
-     */
-
-    function addSupportedTokens(
-        address[] calldata token,
-        address[] calldata priceFeed
-    ) external onlyOwner {
-        uint len = token.length;
-        for (uint i = 0; i < len; ) {
-            addToken(token[i]);
-            s_priceFeedAddresses[token[i]] = priceFeed[i];
-            unchecked {
-                ++i;
             }
         }
     }
@@ -213,11 +170,19 @@ contract ShakescoSavings is UUPSUpgradeable, Initializable {
     function resetTime(
         uint256 newPeriod,
         uint256 newAmount
-    ) external payable onlyOwner _canReset {
+    ) external onlyOwner _canReset {
         s_timePeriod = newPeriod;
         s_lastTimeStamp = block.timestamp;
         s_amountToReach = newAmount;
         s_canreset = false;
+    }
+
+    function setTokenAddress(
+        address _tokenAddress,
+        address _priceFeed
+    ) external onlyOwner {
+        s_supportedToken = _tokenAddress;
+        s_tokenPriceFeed = _priceFeed;
     }
 
     /// @dev New implementation of this contract. User can choose to
@@ -244,36 +209,7 @@ contract ShakescoSavings is UUPSUpgradeable, Initializable {
         return s_canreset;
     }
 
-    function priceFeedOfToken(address token) external view returns (address) {
-        return s_priceFeedAddresses[token];
-    }
-
-    function supportedTokens() external view returns (address[] memory) {
-        return s_supportedTokens;
-    }
-
     function version() external pure returns (uint) {
-        return 2;
-    }
-
-    function addToken(address token) private {
-        bool found = false;
-        uint len = s_supportedTokens.length;
-        for (uint i = 0; i < len; ) {
-            if (s_supportedTokens[i] == token) {
-                found = true;
-                break;
-            }
-            if (!found && i == (s_supportedTokens.length - 1)) {
-                s_supportedTokens.push(token);
-            }
-            unchecked {
-                ++i;
-            }
-        }
-
-        if (s_supportedTokens.length == 0) {
-            s_supportedTokens.push(token);
-        }
+        return 1;
     }
 }

@@ -1,26 +1,19 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.18;
 
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@account-abstraction/contracts/core/BaseAccount.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "../Shakesco/PriceConverter.sol";
 
 error ACCOUNT__NOTOWNER();
 error ACCOUNT_TRANSACTIONFAILED();
 error ACCOUNT__INVALIDLENGTH();
 error ACCOUNT__NOTENTRYPOINT();
 error ACCOUNT__NOTEXECUTE();
-error ACCOUNT__DOESNOTACCEPTREQUEST();
-error ACCOUNT__CANNOTADDSELF();
-error ACCOUNT__OUTOFBOUND();
-error ACCOUNT__ALREADYACCEPTED();
 
 /// @title Smart Wallet(For user)
 /// @author Shawn Kimtai
@@ -37,9 +30,7 @@ error ACCOUNT__ALREADYACCEPTED();
 /// @dev easier for us to have all operations handled by this contract and still
 /// @dev have the n partipants own those other accounts
 
-using SafeMath for uint256;
 using ECDSA for bytes32;
-using PriceConverter for uint256;
 
 contract ShakescoAccount is
     IERC721Receiver,
@@ -63,29 +54,16 @@ contract ShakescoAccount is
     bool private s_acceptGroupInvite;
     //groups
     mapping(address => Group) private s_groups;
+    //split payment mapping for people allowed to pull from account
     mapping(address => uint256) private s_splitPay;
+    //Group array
+    address[] private s_allGroups;
 
     event FundsMoved(
         address indexed to,
         uint256 indexed amount,
         bytes indexed func
     );
-    event NFTTransfer(
-        address indexed to,
-        uint256 indexed tokenId,
-        address indexed erc721Address
-    );
-    event SendBusiness(
-        address indexed to,
-        uint256 indexed amountofEth,
-        uint256 indexed amountOfToken
-    );
-    event AutoSaved(
-        uint256 indexed amount,
-        uint256 indexed percent,
-        address indexed thisContract
-    );
-    event AutoSaveFailed(string indexed failed);
     event AccountInitilized(address indexed entryPoint, address indexed owner);
 
     /// @dev checks if contract owner called functions with this access modifier
@@ -104,22 +82,12 @@ contract ShakescoAccount is
         _;
     }
 
-    /// @dev checks if functions with this access modifier were called by entrypoint
-    modifier acceptingRequests() {
-        if (!s_acceptGroupInvite) {
-            revert ACCOUNT__DOESNOTACCEPTREQUEST();
-        }
-        _;
-    }
-
     struct Group {
         string name;
         string image;
         address owner;
         bool status;
     }
-
-    address[] private s_allGroups;
 
     /// @dev Initialize entrypoint here. For any change in the contract address
     ///      a new implementation of this contract has to be deployed(This saves
@@ -224,7 +192,7 @@ contract ShakescoAccount is
      */
     function pullSplitPay(address receiver, uint amount) external {
         uint left = s_splitPay[msg.sender];
-        if (left <= 0 || amount > left) {
+        if (left == 0 || amount > left) {
             revert ACCOUNT_TRANSACTIONFAILED();
         }
 
@@ -238,80 +206,6 @@ contract ShakescoAccount is
     }
 
     /**
-     * @dev The following function servers to add account to group
-     * @param group The group you are being invited to
-     * @param owner The owner of the group
-     * @param name The name of the group
-     */
-
-    function inviteToGroup(
-        address group,
-        address owner,
-        string calldata name,
-        string calldata image
-    ) external acceptingRequests {
-        if (owner == address(this) || s_groups[group].status) {
-            revert ACCOUNT__CANNOTADDSELF();
-        }
-
-        s_groups[group].name = name;
-        s_groups[group].image = image;
-        s_groups[group].owner = owner;
-        s_groups[group].status = false;
-        s_allGroups.push(group);
-    }
-
-    /**
-     * @dev Account can accept invitations to groups with this function
-     * @param group The group you want to accept invitation to.
-     */
-
-    function acceptGroupInvite(address group) external onlyOwner {
-        if (s_groups[group].status) {
-            revert ACCOUNT__ALREADYACCEPTED();
-        }
-
-        s_groups[group].status = true;
-        (bool success, ) = group.call(abi.encodeWithSignature("addToGroup()"));
-
-        if (!success) {
-            revert ACCOUNT_TRANSACTIONFAILED();
-        }
-    }
-
-    /**
-     * @dev Exit group
-     * @param group Group to exit
-     */
-
-    function exitGroup(address group) external onlyOwner {
-        s_groups[group].status = false;
-
-        uint select;
-        uint len = s_allGroups.length;
-        for (uint i = 0; i < len; ) {
-            if (s_allGroups[i] == group) {
-                select = i;
-                break;
-            }
-            unchecked {
-                ++i;
-            }
-        }
-        remove(select);
-
-        (bool success, ) = group.call(abi.encodeWithSignature("exitGroup()"));
-
-        if (!success) {
-            revert ACCOUNT_TRANSACTIONFAILED();
-        }
-    }
-
-    function changeRequestStatus(bool status) external onlyOwner {
-        s_acceptGroupInvite = status;
-    }
-
-    /**
      * @dev The following function will help users to set their savings address for
      * autosaving.
      * @dev Called on deployment of saving
@@ -322,6 +216,10 @@ contract ShakescoAccount is
         address payable mySavingsAddress,
         uint256 percent
     ) external onlyOwner {
+        if (percent > 100) {
+            revert ACCOUNT_TRANSACTIONFAILED();
+        }
+
         savingsAddress = mySavingsAddress;
         s_autoSavingPercent = percent;
         percent > 0 ? s_canAutoSave = true : s_canAutoSave = false;
@@ -332,6 +230,10 @@ contract ShakescoAccount is
      */
 
     function setAutoSaving(uint256 percent) external onlyOwner {
+        if (percent > 100) {
+            revert ACCOUNT_TRANSACTIONFAILED();
+        }
+
         s_autoSavingPercent = percent;
         s_canAutoSave = true;
     }
@@ -344,70 +246,70 @@ contract ShakescoAccount is
         s_canAutoSave = false;
     }
 
+    /**
+     * @dev The following function will help users to receive ether or token
+     * and autosave if they have set autosaving
+     * @param _tokenAddress The address of the token received
+     * @param _amount The amount received if its token
+     */
+
+    function receiveAndSave(
+        address _tokenAddress,
+        uint256 _amount
+    ) external payable nonReentrant {
+        if (_tokenAddress == address(0)) {
+            _autoSaveWhenReceive(_tokenAddress, msg.value);
+        } else {
+            bool success = IERC20(_tokenAddress).transferFrom(
+                msg.sender,
+                address(this),
+                _amount
+            );
+
+            if (!success) {
+                revert ACCOUNT_TRANSACTIONFAILED();
+            }
+
+            _autoSaveWhenReceive(_tokenAddress, _amount);
+        }
+    }
+
+    /**
+     * @dev The following function will help users to auto save when they receive
+     * ether or token
+     * @param _tokenAddress The address of the token received
+     * @param _amount The amount received if its token
+     */
+
+    function _autoSaveWhenReceive(
+        address _tokenAddress,
+        uint256 _amount
+    ) private {
+        uint precisionPercent = s_autoSavingPercent * 100;
+
+        uint256 saveAmount = (_amount * precisionPercent) / 10000;
+
+        if (s_canAutoSave && saveAmount > 0) {
+            if (_tokenAddress == address(0)) {
+                (bool success, ) = savingsAddress.call{value: saveAmount}("");
+                if (!success) {
+                    revert ACCOUNT_TRANSACTIONFAILED();
+                }
+            } else {
+                bool success = IERC20(_tokenAddress).transfer(
+                    savingsAddress,
+                    saveAmount
+                );
+                if (!success) {
+                    revert ACCOUNT_TRANSACTIONFAILED();
+                }
+            }
+        }
+    }
+
     ////////////////////////////////////////
-    ////////////GET FUNCTIONS///////////////
+    ////////////ERC-4337 FUNCTIONS//////////
     ////////////////////////////////////////
-
-    function getSavingAddress() external view returns (address) {
-        return savingsAddress;
-    }
-
-    function getAuto() external view returns (bool) {
-        return s_canAutoSave;
-    }
-
-    function getSplitPay(address pay) external view returns (uint) {
-        return s_splitPay[pay];
-    }
-
-    function getGroups() external view returns (address[] memory) {
-        return s_allGroups;
-    }
-
-    function getGroupDetails(
-        address group
-    ) external view returns (bool, string memory, string memory, address) {
-        return (
-            s_groups[group].status,
-            s_groups[group].name,
-            s_groups[group].image,
-            s_groups[group].owner
-        );
-    }
-
-    function getRequest() external view returns (bool) {
-        return s_acceptGroupInvite;
-    }
-
-    function getAutoPercent() external view returns (uint256) {
-        return s_autoSavingPercent;
-    }
-
-    /**
-     * @notice check current account deposit in the entryPoint
-     */
-    function getDeposit() public view returns (uint256) {
-        return entryPoint().balanceOf(address(this));
-    }
-
-    /**
-     * @notice deposit more funds for this account in the entryPoint
-     */
-    function addDeposit() public payable onlyOwner {
-        entryPoint().depositTo{value: msg.value}(address(this));
-    }
-
-    /**
-     * @notice withdraw value from the account's deposit
-     * @param withdrawAddress target to send to
-     * @param amount to withdraw
-     */
-    function withdrawDepositTo(
-        address payable withdrawAddress,
-        uint256 amount
-    ) external onlyOwner {
-        entryPoint().withdrawTo(withdrawAddress, amount);
-    }
 
     /**
      * @notice Owner can authorize update
@@ -461,6 +363,26 @@ contract ShakescoAccount is
         emit FundsMoved(_to, _amount, func);
     }
 
+    ////////////////////////////////////////
+    ////////////GET FUNCTIONS///////////////
+    ////////////////////////////////////////
+
+    function getSavingAddress() external view returns (address) {
+        return savingsAddress;
+    }
+
+    function getAuto() external view returns (bool) {
+        return s_canAutoSave;
+    }
+
+    function getSplitPay(address pay) external view returns (uint) {
+        return s_splitPay[pay];
+    }
+
+    function getAutoPercent() external view returns (uint256) {
+        return s_autoSavingPercent;
+    }
+
     function isAuthorized(address user) external view returns (bool) {
         if (address(this) == user) return true;
         return false;
@@ -471,21 +393,6 @@ contract ShakescoAccount is
     }
 
     function version() external pure returns (uint256) {
-        return 3;
-    }
-
-    function remove(uint _index) private {
-        uint len = s_allGroups.length;
-        if (_index > len) {
-            revert ACCOUNT__OUTOFBOUND();
-        }
-
-        for (uint i = _index; i < len - 1; ) {
-            s_allGroups[i] = s_allGroups[i + 1];
-            unchecked {
-                ++i;
-            }
-        }
-        s_allGroups.pop();
+        return 4;
     }
 }

@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
-import {ShakescoSavings} from "../Users/Savings.sol";
+import {ShakescoSavings} from "../Shakesco/Savings.sol";
 import "@openzeppelin/contracts/utils/Create2.sol";
 
 contract ShakescoSavingsFactory {
