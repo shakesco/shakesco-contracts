@@ -42,7 +42,6 @@ These contracts are deployed only on Polygon:
 | Contract Name                |                  Address                   |
 | ---------------------------- | :----------------------------------------: |
 | ShakescoBusinessTokenFactory | 0xf52BB9113ed2A39C577b951beFFB6640E79A7d27 |
-| ShakescoManageToken          |           [Contact for address]            |
 | ShakescoUsername             | 0x3D134E5e7B8239AB76478B359092a988e69eE55e |
 | ShakescoTradeTokens          | 0x2768B372Fb14ad115bCeaAD5441Af9625e5eFa40 |
 
