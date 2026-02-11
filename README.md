@@ -24,7 +24,7 @@ These contracts are deployed on both Ethereum and Polygon networks:
 | ShakescoBusinessFactory        | 0x59D6951f45C89fC0f75294AE0D1823fF650621E1 |
 | ShakescoBusinessFactoryUpdate  | 0x554263beEC3d5275DC0404E1a0ec2C36813f1FCC |
 | ShakescoBusinessSavingsFactory | 0x2b1aEc50936e59cEeBD2C039D7AcE43D88355E71 |
-| ShakescoPrivate                | 0xBCe3e2b54E1cc2196d2eBea6211F739642A60c7a |
+| ShakescoPrivate                | 0xA7Be62548d08135f1f34fcf4881D35eBE649248a |
 | StealthShakescoAccountFactory  | 0xe18e9DF923aa82C3D7B593d657a653DBcc79B6e3 |
 
 ### Ethereum Only
