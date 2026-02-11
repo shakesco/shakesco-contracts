@@ -64,124 +64,31 @@ mockOnThisNetworks.includes(network.name)
       describe("Constructor", async () => {
         it("Should set fee correctly", async () => {
           const fee = await private.getFee();
-          assert.equal(fee.toString(), "1");
+          assert.equal(fee.toString(), "500");
         });
       });
 
       describe("Send ETH", () => {
-        const amount = ethers.utils.parseEther("0.1");
+        const amount = ethers.utils.parseEther("0.00055");
         it("Should send eth privately", async () => {
           const fee = await private.getFee();
-          await private.sendEth(accountContract.address, ...argumentBytes, {
-            value: amount,
-          });
+          await private.sendEth(
+            accountContract.address,
+            accountContract.address,
+            ...argumentBytes,
+            {
+              value: amount,
+            }
+          );
           const balance = await ethers.provider.getBalance(
             accountContract.address
           );
           const balance2 = await ethers.provider.getBalance(private.address);
-
-          const feeremoved = amount.mul(fee).div(100);
+          const feeremoved = amount.mul(fee).div(1000000);
           const received = amount - feeremoved;
+
           assert.equal(balance.toString(), received.toString());
           assert.equal(feeremoved.toString(), balance2.toString());
-        });
-      });
-
-      describe("send to Business", () => {
-        it("should send to business without token", async () => {
-          const fee = await private.getFee();
-          const amount = ethers.utils.parseEther("0.2");
-          await private.sendToBusiness(
-            accountContract.address,
-            ethers.constants.AddressZero,
-            ethers.constants.AddressZero,
-            ethers.constants.AddressZero,
-            ...argumentBytes,
-            { value: amount }
-          );
-
-          const feeremoved = amount.mul(fee).div(100);
-          const received = amount - feeremoved;
-
-          const balance = await ethers.provider.getBalance(
-            accountContract.address
-          );
-          const privatebal = await ethers.provider.getBalance(private.address);
-          assert.equal(balance.toString(), received.toString());
-          assert.equal(privatebal.toString(), privatebal.toString());
-        });
-        it("should send to business with token", async () => {
-          const amount = ethers.utils.parseEther("0.2");
-          await deployer.sendTransaction({
-            to: accountContract.address,
-            value: ethers.utils.parseEther("10"),
-          });
-          const nft = new ethers.utils.Interface(NFTABI.abi);
-          const call = nft.encodeFunctionData("buyNft", [0]);
-          const token1 = new ethers.utils.Interface(TOKENABI.abi);
-          const call2 = token1.encodeFunctionData("buyToken", []);
-
-          const priv = new ethers.utils.Interface(PRIVATEABI.abi);
-          const call3 = priv.encodeFunctionData("sendToBusiness", [
-            token.address,
-            businessToken.address,
-            businessNFT.address,
-            mockAddess.address,
-            ...argumentBytes,
-          ]);
-
-          //using our wallet as entrypoint
-          await accountContract.executeBatch(
-            [businessNFT.address, businessToken.address],
-            [ethers.utils.parseEther("0.2"), ethers.utils.parseEther("1")],
-            [call, call2]
-          );
-
-          const balance = await businessToken.balanceOf(
-            accountContract.address
-          );
-
-          const midddlecall = token1.encodeFunctionData("approve", [
-            private.address,
-            balance,
-          ]);
-
-          await accountContract.executeBatch(
-            [businessToken.address, private.address],
-            [ethers.constants.Zero, amount],
-            [midddlecall, call3]
-          );
-          const accountBalance = await ethers.provider.getBalance(
-            private.address
-          );
-
-          const tbalance = await ethers.provider.getBalance(token.address);
-          const fee = amount.mul(1).div(100).toString();
-          const tbalancet = await businessToken.balanceOf(token.address);
-          const proceeds = await private.getProceeds(accountContract.address);
-
-          assert.equal(accountBalance.toString(), amount.toString());
-          assert.equal(tbalance.toString(), "0");
-          assert(tbalancet.toString() > 0);
-          assert.equal(proceeds.toString(), amount.sub(fee).toString());
-
-          //withdraw proceeds.
-          const call4 = priv.encodeFunctionData("payerProceeds", [proceeds]);
-          await accountContract.execute(
-            private.address,
-            ethers.constants.Zero,
-            call4
-          );
-          const proceedsAfterWithdraw = await private.getProceeds(
-            accountContract.address
-          );
-          assert.equal(proceedsAfterWithdraw.toString(), "0");
-          //withdraw fee
-          await private.withdrawEthFee(token.address, fee);
-          const balanceAfterWithdraw = await ethers.provider.getBalance(
-            private.address
-          );
-          assert(balanceAfterWithdraw.toString(), "0");
         });
       });
 

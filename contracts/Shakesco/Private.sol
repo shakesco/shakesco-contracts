@@ -2,10 +2,12 @@
 pragma solidity ^0.8.18;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 error PRIVATE__NOTOWNER();
 error PRIVATE__TXFAILED();
 error PRIVATE__NOTENOUGHFUNDS();
+error PRIVATE__INVALID_AMOUNT();
 
 /**
  * @title Private transactions with Stealth Addresses
@@ -60,14 +62,15 @@ contract ShakescoPrivate is ReentrancyGuard {
         address payable _recipient,
         bytes32 _pkx,
         bytes32 _ciphertext
-    ) external payable {
-        uint256 _amountSent;
+    ) external payable nonReentrant {
+        if (msg.value == 0) revert PRIVATE__INVALID_AMOUNT();
 
         uint takeFee = (msg.value * s_fee) / FEE_DENOMINATOR;
 
-        _amountSent = msg.value - takeFee;
+        uint256 _amountSent = msg.value - takeFee;
 
         (bool success, ) = _smartWallet.call{value: _amountSent}("");
+
         if (!success) {
             revert PRIVATE__TXFAILED();
         }
@@ -83,6 +86,7 @@ contract ShakescoPrivate is ReentrancyGuard {
 
     /**
      * @notice Send Token Or NFT to the smart stealth address
+     * @param _smartWallet The smart stealth address
      * @param _recipient The stealth address
      * @param _tokenAddress The token address
      * @param _amount The amount of token sent
@@ -90,15 +94,39 @@ contract ShakescoPrivate is ReentrancyGuard {
      * @param _ciphertext Encrypted random number
      */
     function sendToken(
+        address payable _smartWallet,
         address payable _recipient,
         address _tokenAddress,
         uint256 _amount,
         bytes32 _pkx,
         bytes32 _ciphertext
-    ) external {
+    ) external nonReentrant {
+        if (_amount == 0) revert PRIVATE__INVALID_AMOUNT();
+
+        uint takeFee = (_amount * s_fee) / FEE_DENOMINATOR;
+
+        uint256 _amountSent = _amount - takeFee;
+
+        //send to self and send to _recipient
+        bool success = IERC20(_tokenAddress).transferFrom(
+            msg.sender,
+            address(this),
+            takeFee
+        );
+
+        bool successSend = IERC20(_tokenAddress).transferFrom(
+            msg.sender,
+            _smartWallet,
+            _amountSent
+        );
+
+        if (!success || !successSend) {
+            revert PRIVATE__TXFAILED();
+        }
+
         emit Announcement(
             _recipient,
-            _amount,
+            _amountSent,
             _tokenAddress,
             _pkx,
             _ciphertext
