@@ -27,10 +27,8 @@ contract ShakescoPrivate is ReentrancyGuard {
     uint256 constant FEE_DENOMINATOR = 1000000;
 
     event Announcement(
-        address indexed smartWallet,
         address indexed receiver,
         uint256 amount,
-        uint256 salt,
         address indexed tokenAddress,
         bytes32 pkx,
         bytes32 ciphertext
@@ -54,14 +52,12 @@ contract ShakescoPrivate is ReentrancyGuard {
      * @notice Send ETH to the stealth address
      * @param _smartWallet The smart stealth address
      * @param _recipient The stealth address
-     * @param _salt Random salt value
      * @param _pkx public key X coordinate
      * @param _ciphertext Encrypted random number
      */
     function sendEth(
-        address _smartWallet,
+        address payable _smartWallet,
         address payable _recipient,
-        uint256 _salt,
         bytes32 _pkx,
         bytes32 _ciphertext
     ) external payable {
@@ -77,10 +73,8 @@ contract ShakescoPrivate is ReentrancyGuard {
         }
 
         emit Announcement(
-            _smartWallet,
             _recipient,
             _amountSent,
-            _salt,
             ETH_TOKEN_PLACHOLDER,
             _pkx,
             _ciphertext
@@ -89,28 +83,22 @@ contract ShakescoPrivate is ReentrancyGuard {
 
     /**
      * @notice Send Token Or NFT to the smart stealth address
-     * @param _smartWallet The smart stealth address
      * @param _recipient The stealth address
      * @param _tokenAddress The token address
      * @param _amount The amount of token sent
-     * @param _salt Random salt value
      * @param _pkx public key X coordinate
      * @param _ciphertext Encrypted random number
      */
     function sendToken(
-        address _smartWallet,
         address payable _recipient,
         address _tokenAddress,
         uint256 _amount,
-        uint256 _salt,
         bytes32 _pkx,
         bytes32 _ciphertext
     ) external {
         emit Announcement(
-            _smartWallet,
             _recipient,
             _amount,
-            _salt,
             _tokenAddress,
             _pkx,
             _ciphertext
