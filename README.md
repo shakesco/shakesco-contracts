@@ -89,9 +89,9 @@ npx hardhat deploy --network <network of choice>
 Tests had to be done in two ways to optimize costs:
 
 - Tests done locally that don't require UserOp
-- Tests on UserOp have been done with [**Biconomy**](https://docs.biconomy.io/ "BiconomyAPI")
+- Tests on UserOp have been done with [**Alchemy**](https://www.alchemy.com/docs/wallets/api-reference/bundler-api/bundler-api-endpoints/eth-send-user-operation "AlchemyAA")
 
-> 💡Tip: For this section you need API keys from either [**Alchemy**](https://www.alchemy.com/learn/account-abstraction "AlchemyAA") or [**Biconomy**](https://docs.biconomy.io/ "BiconomyAPI"). We recommend Biconomy.
+> 💡Tip: For this section you need API keys from either [**Alchemy**](https://www.alchemy.com/docs/wallets/api-reference/bundler-api/bundler-api-endpoints/eth-send-user-operation "AlchemyAA") or [**Biconomy**](https://docs.biconomy.io/ "BiconomyAPI"). We recommend Alchemy.
 
 After getting your API keys:
 

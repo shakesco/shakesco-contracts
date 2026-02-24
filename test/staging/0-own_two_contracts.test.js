@@ -286,7 +286,7 @@ mockOnThisNetworks.includes(network.name)
 
           const options = {
             method: "POST",
-            url: process.env.STACKUPAPIKEY,
+            url: process.env.ALCHEMYAPIKEY,
             headers: {
               accept: "application/json",
               "content-type": "application/json",
@@ -408,7 +408,7 @@ mockOnThisNetworks.includes(network.name)
 
           const options = {
             method: "POST",
-            url: process.env.STACKUPAPIKEY,
+            url: process.env.ALCHEMYAPIKEY,
             headers: {
               accept: "application/json",
               "content-type": "application/json",
