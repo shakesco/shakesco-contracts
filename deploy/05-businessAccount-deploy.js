@@ -1,24 +1,13 @@
 const { ethers, network } = require("hardhat");
-const {
-  ENTRYPOINT,
-  SHAKESCO,
-  networkConfig,
-} = require("../helper-hardhat-config");
+const { ENTRYPOINT, SHAKESCO } = require("../helper-hardhat-config");
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
   const { deploy, log } = deployments;
   const { deployer } = await getNamedAccounts();
 
-  const chainId = network.config.chainId;
-  let priceFeed;
-
   log("\n Deploying business account...");
 
-  if (chainId == 31337) {
-    priceFeed = (await ethers.getContract("MockV3Aggregator")).address;
-  } else {
-    priceFeed = networkConfig[chainId]["maticUsdPriceFeed"];
-  }
+  let priceFeed = (await ethers.getContract("ShakescoFeedRegistry")).address;
 
   await deploy("ShakescoBusinessContract", {
     from: deployer,
@@ -29,7 +18,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         args: [SHAKESCO],
       },
     },
-    args: [ENTRYPOINT],
+    args: [ENTRYPOINT, priceFeed],
     log: true,
     waitConfirmation: network.config.blockConfirmation || 1,
   });

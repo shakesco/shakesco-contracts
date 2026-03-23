@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "../Shakesco/PriceConverter.sol";
+import "../Shakesco/ShakescoRegistry.sol";
 
 error BUSINESSCONTRACT__NOTOWNER();
 error BUSINESSCONTRACT__TRANSACTIONFAILED();
@@ -55,6 +56,8 @@ contract ShakescoBusinessContract is
     IEntryPoint private immutable s_entryPoint;
     //spending for airdrop
     mapping(address => uint256) private s_spendingOnBusinessForDrop;
+    //price feed registry
+    address private immutable i_feedRegistry;
 
     event FundsMoved(
         address indexed to,
@@ -82,8 +85,9 @@ contract ShakescoBusinessContract is
         _;
     }
 
-    constructor(address _entryPoint) {
+    constructor(address _entryPoint, address feedAddress) {
         s_entryPoint = IEntryPoint(_entryPoint);
+        i_feedRegistry = feedAddress;
         _disableInitializers();
     }
 
@@ -130,8 +134,8 @@ contract ShakescoBusinessContract is
         bytes[] calldata func
     ) external onlyEntryPoint {
         if (
-            _to.length != func.length &&
-            (_amount.length != 0 || _amount.length != func.length)
+            _to.length != func.length ||
+            (_amount.length != 0 && _amount.length != func.length)
         ) {
             revert BUSINESSCONTRACT__INVALIDLENGTH();
         }
@@ -162,87 +166,12 @@ contract ShakescoBusinessContract is
     }
 
     /**
-     * @dev The following function will help users to set their savings address for
-     * autosaving.
-     * @param mySavingsAddress The address the user has received as their address
-     * @param percent The percent the business wants to autosave with every native asset credit.
-     */
-
-    function setSavingsAddress(
-        address payable mySavingsAddress,
-        uint256 percent
-    ) external onlyOwner {
-        if (percent > 100) {
-            revert BUSINESSCONTRACT__TRANSACTIONFAILED();
-        }
-
-        businessSaving = mySavingsAddress;
-        s_autoSavingPercent = percent;
-        s_canAutoSave = percent > 0 ? true : false;
-    }
-
-    /**
-     * @dev The following function sets autoSaving to true.
-     * @param percent The percent the business wants to autosave with every native asset credit.
-     */
-
-    function setAutoSaving(uint256 percent) external onlyOwner {
-        if (percent > 100) {
-            revert BUSINESSCONTRACT__TRANSACTIONFAILED();
-        }
-
-        s_autoSavingPercent = percent;
-        s_canAutoSave = true;
-    }
-
-    /**
-     * @dev The following function removes autoSaving.
-     */
-
-    function removeAutoSaving() external onlyOwner {
-        s_canAutoSave = false;
-    }
-
-    /**
-     * @dev The following function will help users to auto save when they receive
-     * ether or token
-     * @param tokenAddress The address of the token received
-     * @param amount The amount received if its token
-     */
-
-    function _autoSaveWhenReceive(
-        address tokenAddress,
-        uint256 amount
-    ) private {
-        uint precisionPercent = s_autoSavingPercent * 100;
-
-        uint256 saveAmount = (amount * precisionPercent) / 10000;
-
-        if (s_canAutoSave && saveAmount > 0) {
-            if (tokenAddress == address(0)) {
-                (bool success, ) = businessSaving.call{value: saveAmount}("");
-                if (!success) {
-                    revert BUSINESSCONTRACT__TRANSACTIONFAILED();
-                }
-            } else {
-                bool success = IERC20(tokenAddress).transfer(
-                    businessSaving,
-                    saveAmount
-                );
-                if (!success) {
-                    revert BUSINESSCONTRACT__TRANSACTIONFAILED();
-                }
-            }
-        }
-    }
-
-    /**
      * @dev The following function sets the nft address
      * @dev Called when they deploy nft/sbt contract so as to set address
      * @param nftAddress The nftAddress of the business that has employees.
      */
 
-    function setPayToEmployee(address nftAddress) external onlyOwner {
+    function setNFTAddress(address nftAddress) external onlyOwner {
         s_businessNFTAddress = nftAddress;
     }
 
@@ -331,29 +260,12 @@ contract ShakescoBusinessContract is
     ////////////////GET FUNCTIONS////////////
     ////////////////////////////////////////
 
-    function isAuthorized(address user) external view returns (bool) {
-        if (address(this) == user) return true;
-        return false;
-    }
-
-    function getSavingAddress() external view returns (address) {
-        return businessSaving;
-    }
-
     function getNFTAddress() external view returns (address) {
         return s_businessNFTAddress;
     }
 
     function getTokenAddress() external view returns (address) {
         return s_businessTokenAddress;
-    }
-
-    function getAuto() external view returns (bool) {
-        return s_canAutoSave;
-    }
-
-    function getAutoPercent() external view returns (uint256) {
-        return s_autoSavingPercent;
     }
 
     function getSpentOnBusiness(address spender) public view returns (uint256) {
@@ -375,6 +287,6 @@ contract ShakescoBusinessContract is
     }
 
     function version() external pure returns (uint256) {
-        return 4;
+        return 5;
     }
 }

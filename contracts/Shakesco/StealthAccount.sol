@@ -99,8 +99,8 @@ contract StealthShakescoAccount is
         bytes[] calldata func
     ) external onlyEntryPoint {
         if (
-            _to.length != func.length &&
-            (_amount.length != 0 || _amount.length != func.length)
+            _to.length != func.length ||
+            (_amount.length != 0 && _amount.length != func.length)
         ) {
             revert ACCOUNT__INVALIDLENGTH();
         }

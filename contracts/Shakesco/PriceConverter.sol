@@ -11,13 +11,6 @@ library PriceConverter {
         return uint256(answer * 1e10);
     }
 
-    function getPriceForPaymaster(
-        AggregatorV3Interface priceFeed
-    ) internal view returns (uint192) {
-        (, int256 answer, , , ) = priceFeed.latestRoundData();
-        return uint192(int192(answer));
-    }
-
     function getConvertionRate(
         uint256 ethAmount,
         AggregatorV3Interface priceFeed

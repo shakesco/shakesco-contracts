@@ -4,8 +4,6 @@ pragma solidity ^0.8.18;
 import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AutomationRegistryInterface2_0.sol";
 import "../Interface/KeeperRegistrarInterface.sol";
-import "../Business/BusinessContract.sol";
-import "../Users/Account.sol";
 
 error REGISTERAUTOMATION__NOTOWNER();
 error REGISTERAUTOMATION__NOTSHAKESCOUSER();
@@ -21,20 +19,6 @@ contract ShakescoRegisterAutomation {
     modifier onlyOwner() {
         if (msg.sender != owner) {
             revert REGISTERAUTOMATION__NOTOWNER();
-        }
-        _;
-    }
-
-    modifier onlyShakescoUsers(address payable shakescoUser) {
-        ShakescoAccount user = ShakescoAccount(shakescoUser);
-        ShakescoBusinessContract business = ShakescoBusinessContract(
-            shakescoUser
-        );
-        if (
-            !user.isAuthorized(shakescoUser) ||
-            !business.isAuthorized(shakescoUser)
-        ) {
-            revert REGISTERAUTOMATION__NOTSHAKESCOUSER();
         }
         _;
     }
@@ -55,9 +39,7 @@ contract ShakescoRegisterAutomation {
 
     receive() external payable {}
 
-    function register(
-        RegistrationParams calldata requestParams
-    ) external onlyShakescoUsers(payable(msg.sender)) {
+    function register(RegistrationParams calldata requestParams) external {
         linkToken.approve(address(s_registrar), requestParams.amount);
         uint256 upkeepId = s_registrar.registerUpkeep(requestParams);
         if (upkeepId != 0) {

@@ -142,10 +142,10 @@ contract ShakescoAccount is
         bytes[] calldata func
     ) external onlyEntryPoint {
         if (
-            _to.length != func.length &&
-            (_amount.length != 0 || _amount.length != func.length)
+            _to.length != func.length ||
+            (_amount.length != 0 && _amount.length != func.length)
         ) {
-            revert ACCOUNT__INVALIDLENGTH();
+            revert ACCOUNT_TRANSACTIONFAILED();
         }
         if (_amount.length == 0) {
             for (uint256 i = 0; i < _to.length; i++) {
@@ -202,108 +202,6 @@ contract ShakescoAccount is
 
         if (!success) {
             revert ACCOUNT_TRANSACTIONFAILED();
-        }
-    }
-
-    /**
-     * @dev The following function will help users to set their savings address for
-     * autosaving.
-     * @dev Called on deployment of saving
-     * @param mySavingsAddress The address the user has received as their address
-     */
-
-    function setSavingsAddress(
-        address payable mySavingsAddress,
-        uint256 percent
-    ) external onlyOwner {
-        if (percent > 100) {
-            revert ACCOUNT_TRANSACTIONFAILED();
-        }
-
-        savingsAddress = mySavingsAddress;
-        s_autoSavingPercent = percent;
-        percent > 0 ? s_canAutoSave = true : s_canAutoSave = false;
-    }
-
-    /**
-     * @dev The following function sets autoSaving to true.
-     */
-
-    function setAutoSaving(uint256 percent) external onlyOwner {
-        if (percent > 100) {
-            revert ACCOUNT_TRANSACTIONFAILED();
-        }
-
-        s_autoSavingPercent = percent;
-        s_canAutoSave = true;
-    }
-
-    /**
-     * @dev The following function removes autoSaving.
-     */
-
-    function removeAutoSaving() external onlyOwner {
-        s_canAutoSave = false;
-    }
-
-    /**
-     * @dev The following function will help users to receive ether or token
-     * and autosave if they have set autosaving
-     * @param _tokenAddress The address of the token received
-     * @param _amount The amount received if its token
-     */
-
-    function receiveAndSave(
-        address _tokenAddress,
-        uint256 _amount
-    ) external payable nonReentrant {
-        if (_tokenAddress == address(0)) {
-            _autoSaveWhenReceive(_tokenAddress, msg.value);
-        } else {
-            bool success = IERC20(_tokenAddress).transferFrom(
-                msg.sender,
-                address(this),
-                _amount
-            );
-
-            if (!success) {
-                revert ACCOUNT_TRANSACTIONFAILED();
-            }
-
-            _autoSaveWhenReceive(_tokenAddress, _amount);
-        }
-    }
-
-    /**
-     * @dev The following function will help users to auto save when they receive
-     * ether or token
-     * @param _tokenAddress The address of the token received
-     * @param _amount The amount received if its token
-     */
-
-    function _autoSaveWhenReceive(
-        address _tokenAddress,
-        uint256 _amount
-    ) private {
-        uint precisionPercent = s_autoSavingPercent * 100;
-
-        uint256 saveAmount = (_amount * precisionPercent) / 10000;
-
-        if (s_canAutoSave && saveAmount > 0) {
-            if (_tokenAddress == address(0)) {
-                (bool success, ) = savingsAddress.call{value: saveAmount}("");
-                if (!success) {
-                    revert ACCOUNT_TRANSACTIONFAILED();
-                }
-            } else {
-                bool success = IERC20(_tokenAddress).transfer(
-                    savingsAddress,
-                    saveAmount
-                );
-                if (!success) {
-                    revert ACCOUNT_TRANSACTIONFAILED();
-                }
-            }
         }
     }
 
@@ -367,25 +265,8 @@ contract ShakescoAccount is
     ////////////GET FUNCTIONS///////////////
     ////////////////////////////////////////
 
-    function getSavingAddress() external view returns (address) {
-        return savingsAddress;
-    }
-
-    function getAuto() external view returns (bool) {
-        return s_canAutoSave;
-    }
-
     function getSplitPay(address pay) external view returns (uint) {
         return s_splitPay[pay];
-    }
-
-    function getAutoPercent() external view returns (uint256) {
-        return s_autoSavingPercent;
-    }
-
-    function isAuthorized(address user) external view returns (bool) {
-        if (address(this) == user) return true;
-        return false;
     }
 
     function entryPoint() public view virtual override returns (IEntryPoint) {
@@ -393,6 +274,6 @@ contract ShakescoAccount is
     }
 
     function version() external pure returns (uint256) {
-        return 4;
+        return 5;
     }
 }

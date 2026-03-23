@@ -8,8 +8,11 @@ import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 contract ShakescoBusinessFactory {
     ShakescoBusinessContract public immutable businessImplementation;
 
-    constructor(address _entryPoint) {
-        businessImplementation = new ShakescoBusinessContract(_entryPoint);
+    constructor(address _entryPoint, address feedAddress) {
+        businessImplementation = new ShakescoBusinessContract(
+            _entryPoint,
+            feedAddress
+        );
     }
 
     /**

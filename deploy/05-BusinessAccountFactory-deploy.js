@@ -1,5 +1,5 @@
 const { network, ethers } = require("hardhat");
-const { ENTRYPOINT } = require("../helper-hardhat-config");
+const { ENTRYPOINT, SHAKESCOFEED } = require("../helper-hardhat-config");
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
   const { deploy, log } = deployments;
@@ -9,7 +9,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
   const businessFactory = await deploy("ShakescoBusinessFactory", {
     from: deployer,
-    args: [ENTRYPOINT],
+    args: [ENTRYPOINT, SHAKESCOFEED],
     log: true,
     waitConfirmation: network.config.blockConfirmation || 1,
     deterministicDeployment: true,

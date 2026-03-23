@@ -1,8 +1,5 @@
 const { network, deployments, ethers } = require("hardhat");
-const {
-  mockOnThisNetworks,
-  networkConfig,
-} = require("../../helper-hardhat-config");
+const { mockOnThisNetworks } = require("../../helper-hardhat-config");
 const { assert, expect } = require("chai");
 const { argumentBytes } = require("./sample_data");
 const fs = require("fs");
