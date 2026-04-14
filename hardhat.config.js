@@ -17,17 +17,6 @@ const etherscan = process.env.ETHERSCAN_API_KEY;
 const MUMBAI_EXPLORER = process.env.MATIC_EXPLORER_APIKEY;
 const marketCap = process.env.COINMARTKETCAP_API_KEY;
 
-const optimizedCompilerSettings = {
-  version: "0.8.18",
-  settings: {
-    optimizer: {
-      enabled: true,
-      runs: 1000000,
-    },
-    viaIR: true,
-  },
-};
-
 module.exports = {
   solidity: {
     compilers: [
@@ -42,10 +31,6 @@ module.exports = {
       { version: "0.7.6" },
       { version: "0.8.9" },
     ],
-    overrides: {
-      "contracts/Shakesco/Private.sol": optimizedCompilerSettings,
-      "contracts/Business/BusinessNFT.sol": optimizedCompilerSettings,
-    },
   },
 
   contractSizer: {

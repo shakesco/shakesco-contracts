@@ -33,11 +33,11 @@ const mockOnThisNetworks = ["hardhat", "localhost"];
 const DECIMALS = 8;
 const INITIAL_ANSWER = 180000000000;
 //Change any of the below for easier calling in localtest
-const ENTRYPOINT = "0x5ff137d4b0fdcd49dca30c7cf57e578a026d2789";
+const ENTRYPOINT = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789";
 // "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266";
 const SHAKESCO = process.env.SHAKESCO;
 const CALLER = process.env.CALLER;
-const SHAKESCOFEED = "0x245B8C66140A4A2B98fc358a4526653aaEd25177";
+const SHAKESCOFEED = "0x8b34144550162A11cBEB9418F7f4aceB607a85B4";
 
 module.exports = {
   networkConfig,

@@ -10,6 +10,3 @@ artifacts
 deployments
 gas_report.txt
 .solhint.json
-
-/contracts/Business/BusinessNFT.sol
-/contracts/Business/BusinessToken.sol
