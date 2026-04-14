@@ -21,7 +21,7 @@ These contracts are deployed on both Ethereum and Polygon networks:
 | ShakescoAccountFactory        | 0x12ea9e146902cBc0cbd6A205Dd99f88b3dbD321a |
 | ShakescoAccountFactoryUpdate  | 0x740a96bB998d40BE53321B4F4542dEA34Adc885d |
 | ShakescoBusinessFactory       | 0x59D6951f45C89fC0f75294AE0D1823fF650621E1 |
-| ShakescoBusinessFactoryUpdate | 0x5dB19D954385114B52c05363827943EAB19326E0 |
+| ShakescoBusinessFactoryUpdate | 0xF58668e9Fb0f7845F0b196613FBf37079E7c7Ccb |
 | ShakescoPrivate               | 0xA7Be62548d08135f1f34fcf4881D35eBE649248a |
 | StealthShakescoAccountFactory | 0xe18e9DF923aa82C3D7B593d657a653DBcc79B6e3 |
 
@@ -39,9 +39,9 @@ These contracts are deployed only on Polygon:
 
 | Contract Name                |                  Address                   |
 | ---------------------------- | :----------------------------------------: |
-| ShakescoBusinessTokenFactory | 0x5FC4Cf95f0d02aE502c56cFC5c41e633c7B6a431 |
+| ShakescoBusinessTokenFactory | 0xa171836571fffD542A02a9f9651D9c49595038DE |
 | ShakescoUsername             | 0x3D134E5e7B8239AB76478B359092a988e69eE55e |
-| ShakescoTradeTokens          | 0x1B4F0e7bA46A28c358000D9B3973F210a3D48713 |
+| ShakescoTradeTokens          | 0x368214ae188430732FD23d4B938f342C39a28162 |
 
 We have organized our contracts into logical folders:
 
