@@ -42,6 +42,7 @@ These contracts are deployed only on Polygon:
 | ShakescoBusinessTokenFactory | 0xa171836571fffD542A02a9f9651D9c49595038DE |
 | ShakescoUsername             | 0x3D134E5e7B8239AB76478B359092a988e69eE55e |
 | ShakescoTradeTokens          | 0x368214ae188430732FD23d4B938f342C39a28162 |
+| ShakescoManageTokens         | 0xC45522975d38fE427bfC1a0ce02A2E2646f747E9 |
 
 We have organized our contracts into logical folders:
 
