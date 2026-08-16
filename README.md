@@ -51,9 +51,9 @@ BNB Smart Chain is where tokenized stocks settle. Stock accounts are
 `StealthShakescoAccount` wallets created through the same factory used for
 stealth addresses, so a wallet owner always resolves to the same stock account.
 
-| Contract Name                 |                  Address                   |
-| ----------------------------- | :----------------------------------------: |
-| StealthShakescoAccountFactory | 0xe18e9DF923aa82C3D7B593d657a653DBcc79B6e3 |
+| Contract Name       |                  Address                   |
+| ------------------- | :----------------------------------------: |
+| StockAccountFactory | 0xe18e9DF923aa82C3D7B593d657a653DBcc79B6e3 |
 
 The address matches Ethereum and Polygon because the factory is deployed
 through the CREATE2 proxy at `0x4e59b44847b379578588920cA78FbF26c0B4956C`
