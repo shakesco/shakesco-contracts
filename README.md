@@ -47,9 +47,11 @@ These contracts are deployed only on Polygon:
 
 ### BNB Smart Chain Only
 
-BNB Smart Chain is where tokenized stocks settle. Stock accounts are
-`StealthShakescoAccount` wallets created through the same factory used for
-stealth addresses, so a wallet owner always resolves to the same stock account.
+BNB Smart Chain is where tokenized stocks settle. The `StockAccountFactory`
+derives each stock account deterministically from its owner address, so a
+wallet owner always resolves to the same stock account. It is the same factory
+build that backs stealth addresses on Ethereum and Polygon, deployed here under
+the stock account role.
 
 | Contract Name       |                  Address                   |
 | ------------------- | :----------------------------------------: |
