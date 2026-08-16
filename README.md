@@ -48,19 +48,26 @@ These contracts are deployed only on Polygon:
 ### BNB Smart Chain Only
 
 BNB Smart Chain is where tokenized stocks settle. The `StockAccountFactory`
-derives each stock account deterministically from its owner address, so a
-wallet owner always resolves to the same stock account. It is the same factory
-build that backs stealth addresses on Ethereum and Polygon, deployed here under
-the stock account role.
+derives a stock account from its owner address with CREATE2, so the same owner
+always gets the same stock account address on this chain. A stock account is a
+distinct contract with its own address, not the owner's Ethereum or Polygon
+wallet address: those wallets are `ShakescoAccount` and
+`ShakescoBusinessContract` instances deployed by `ShakescoAccountFactory` and
+`ShakescoBusinessFactory`, which are separate factories over separate
+implementations.
 
 | Contract Name       |                  Address                   |
 | ------------------- | :----------------------------------------: |
 | StockAccountFactory | 0xe18e9DF923aa82C3D7B593d657a653DBcc79B6e3 |
 
-The address matches Ethereum and Polygon because the factory is deployed
-through the CREATE2 proxy at `0x4e59b44847b379578588920cA78FbF26c0B4956C`
-(`deterministicDeployment: true`). Identical bytecode and constructor argument
-give an identical address on every chain, so this is not a duplicate entry.
+This is the same factory build as `StealthShakescoAccountFactory` on Ethereum
+and Polygon, deployed here to serve stock accounts. There is no
+`StockAccountFactory` on those chains, only this one on BNB. It carries the
+same address because `28-stealth-account-factory.js` sets
+`deterministicDeployment: true`, which routes the deploy through the CREATE2
+proxy at `0x4e59b44847b379578588920cA78FbF26c0B4956C`. Identical bytecode and
+constructor argument give an identical address on every chain, so the address
+repeating in the tables above is expected, not a copy-paste error.
 
 We have organized our contracts into logical folders:
 
