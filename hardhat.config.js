@@ -12,6 +12,7 @@ const key = process.env.PRIV_KEY;
 const MAIN = process.env.MAINNETPRIVKEY;
 const POLYMAIN = process.env.POLYGON_URL;
 const ETHMAIN = process.env.ETH_URL;
+const BNBMAIN = process.env.BNB_URL;
 const sepoliaKey = process.env.PRIV_KEY2;
 const etherscan = process.env.ETHERSCAN_API_KEY;
 const MUMBAI_EXPLORER = process.env.MATIC_EXPLORER_APIKEY;
@@ -63,6 +64,12 @@ module.exports = {
       url: POLYMAIN,
       accounts: [MAIN],
       chainId: 137,
+      blockConfirmation: 6,
+    },
+    bnb: {
+      url: BNBMAIN,
+      accounts: [MAIN],
+      chainId: 56,
       blockConfirmation: 6,
     },
   },

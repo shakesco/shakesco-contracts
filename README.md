@@ -6,7 +6,7 @@
     - [Tests](#tests)
     - [Features](#features)
 
-Shakesco has built [**Shakesco**](https://shakesco.com/) an [ERC-4337](https://eips.ethereum.org/EIPS/eip-4337) smart wallet on Ethereum and Polygon. No seed phrases, Multi-party Computation (MPC), recurring payments, private transactions, loyalty tokens, stealth addresses, and so much more! Our goal is to make Ethereum user-friendly and secure.
+Shakesco has built [**Shakesco**](https://shakesco.com/) an [ERC-4337](https://eips.ethereum.org/EIPS/eip-4337) smart wallet on Ethereum, Polygon and BNB Smart Chain. No seed phrases, Multi-party Computation (MPC), recurring payments, private transactions, loyalty tokens, stealth addresses, tokenized stocks, and so much more! Our goal is to make Ethereum user-friendly and secure.
 
 ## Contracts
 
@@ -45,6 +45,21 @@ These contracts are deployed only on Polygon:
 | ShakescoTradeTokens          | 0x368214ae188430732FD23d4B938f342C39a28162 |
 | ShakescoManageTokens         | 0x8617a1F14f7684b73D6E205a7eC446851736e416 |
 
+### BNB Smart Chain Only
+
+BNB Smart Chain is where tokenized stocks settle. Stock accounts are
+`StealthShakescoAccount` wallets created through the same factory used for
+stealth addresses, so a wallet owner always resolves to the same stock account.
+
+| Contract Name                 |                  Address                   |
+| ----------------------------- | :----------------------------------------: |
+| StealthShakescoAccountFactory | 0xe18e9DF923aa82C3D7B593d657a653DBcc79B6e3 |
+
+The address matches Ethereum and Polygon because the factory is deployed
+through the CREATE2 proxy at `0x4e59b44847b379578588920cA78FbF26c0B4956C`
+(`deterministicDeployment: true`). Identical bytecode and constructor argument
+give an identical address on every chain, so this is not a duplicate entry.
+
 We have organized our contracts into logical folders:
 
 1. **Business** - Business account logic and features
@@ -65,6 +80,12 @@ Contracts have been deployed on both mainnet and testnet:
 
 - _Amoy_ and _mainnet_ for **Polygon**
 - _Sepolia_ and _mainnet_ for **Ethereum**
+- _mainnet_ for **BNB Smart Chain**
+
+The configured network names are `ethereum`, `polygon`, `bnb`, `sepolia` and
+`mumbai`. Each mainnet network reads its RPC URL from the environment, so `bnb`
+needs `BNB_URL` set in `.env` alongside the existing `ETH_URL` and
+`POLYGON_URL`.
 
 After cloning, try:
 
@@ -142,3 +163,5 @@ _Here we cover the exciting features built by Shakesco._
 13. **Cross-Chain Support** - Support for Ethereum, Polygon, Arbitrum, Optimism, Base, BSC, and Bitcoin Lightning Network.
 
 14. **Marketplace** - Built-in marketplace for businesses to auction loyalty tokens and NFTs to customers.
+
+15. **Tokenized Stocks** - Buy and sell tokenized stocks from the same wallet. Stocks settle on BNB Smart Chain, where every wallet owner gets a dedicated stock account derived deterministically from their owner address. Payments and loyalty programs stay on Ethereum and Polygon.
