@@ -58,16 +58,14 @@ implementations.
 
 | Contract Name       |                  Address                   |
 | ------------------- | :----------------------------------------: |
-| StockAccountFactory | 0xe18e9DF923aa82C3D7B593d657a653DBcc79B6e3 |
+| StockAccountFactory | 0x3aafe312F5520065614c7212e4D76dFa8FF16138 |
 
-This is the same factory build as `StealthShakescoAccountFactory` on Ethereum
-and Polygon, deployed here to serve stock accounts. There is no
-`StockAccountFactory` on those chains, only this one on BNB. It carries the
-same address because `28-stealth-account-factory.js` sets
-`deterministicDeployment: true`, which routes the deploy through the CREATE2
-proxy at `0x4e59b44847b379578588920cA78FbF26c0B4956C`. Identical bytecode and
-constructor argument give an identical address on every chain, so the address
-repeating in the tables above is expected, not a copy-paste error.
+This is the same factory as `StealthShakescoAccountFactory` on Ethereum and
+Polygon, deployed here to serve stock accounts. There is no
+`StockAccountFactory` on those chains, only this one on BNB. Its address differs
+from the Ethereum and Polygon entry because the deploy is CREATE2 based on the
+init code, and the account implementation was corrected after those two chains
+were deployed. Use the address listed per network.
 
 We have organized our contracts into logical folders:
 
