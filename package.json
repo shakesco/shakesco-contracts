@@ -16,7 +16,6 @@
   "dependencies": {
     "@chainlink/contracts": "^0.6.1",
     "@pinata/sdk": "^2.1.0",
-    "@shakesco/private": "^1.2.1",
     "dotenv": "^16.3.1"
   }
 }

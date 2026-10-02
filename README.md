@@ -6,7 +6,7 @@
     - [Tests](#tests)
     - [Features](#features)
 
-Shakesco has built [**Shakesco**](https://shakesco.com/) an [ERC-4337](https://eips.ethereum.org/EIPS/eip-4337) smart wallet on Ethereum, Polygon and BNB Smart Chain. No seed phrases, Multi-party Computation (MPC), recurring payments, private transactions, loyalty tokens, stealth addresses, tokenized stocks, and so much more! Our goal is to make Ethereum user-friendly and secure.
+Shakesco has built [**Shakesco**](https://shakesco.com/) an [ERC-4337](https://eips.ethereum.org/EIPS/eip-4337) smart wallet on Ethereum, Polygon and BNB Smart Chain. No seed phrases, Multi-party Computation (MPC), recurring payments, loyalty tokens, tokenized stocks, and so much more! Our goal is to make Ethereum user-friendly and secure.
 
 ## Contracts
 
@@ -23,8 +23,6 @@ These contracts are deployed on both Ethereum and Polygon networks:
 | ShakescoAccountFactoryUpdate  | 0x740a96bB998d40BE53321B4F4542dEA34Adc885d |
 | ShakescoBusinessFactory       | 0x59D6951f45C89fC0f75294AE0D1823fF650621E1 |
 | ShakescoBusinessFactoryUpdate | 0xF58668e9Fb0f7845F0b196613FBf37079E7c7Ccb |
-| ShakescoPrivate               | 0xA7Be62548d08135f1f34fcf4881D35eBE649248a |
-| StealthShakescoAccountFactory | 0xe18e9DF923aa82C3D7B593d657a653DBcc79B6e3 |
 
 ### Ethereum Only
 
@@ -60,12 +58,9 @@ implementations.
 | ------------------- | :----------------------------------------: |
 | StockAccountFactory | 0x3aafe312F5520065614c7212e4D76dFa8FF16138 |
 
-This is the same factory as `StealthShakescoAccountFactory` on Ethereum and
-Polygon, deployed here to serve stock accounts. There is no
-`StockAccountFactory` on those chains, only this one on BNB. Its address differs
-from the Ethereum and Polygon entry because the deploy is CREATE2 based on the
-init code, and the account implementation was corrected after those two chains
-were deployed. Use the address listed per network.
+The factory source is `contracts/Factory/StealthFactory.sol` and the account it
+deploys is `contracts/Shakesco/StealthAccount.sol`. There is no
+`StockAccountFactory` on Ethereum or Polygon, only this one on BNB.
 
 We have organized our contracts into logical folders:
 
@@ -135,13 +130,11 @@ _Here we cover the exciting features built by Shakesco._
 
 2. **Recurring Payments on Ethereum** - We're excited about this! You can now perform auto-payments on Ethereum. Check out our [documentation](https://docs.shakesco.com/auto-payments/ "auto-payments") on how it works and how you can start receiving auto-payments.
 
-3. **Private Transactions** - Credit to [Umbra](https://github.com/ScopeLift/umbra-protocol/). We use their registry to register keys so that businesses and users can perform private transactions. Check out our [docs](https://docs.shakesco.com/stealth-payments/ "stealth-payments").
+3. **Silent Payments** - Bitcoin Silent Payments implementation for enhanced privacy on Bitcoin transactions. See our [Silent Payments guide](https://docs.shakesco.com/silent-payments/ "silent-payments").
 
-4. **Silent Payments** - Bitcoin Silent Payments implementation for enhanced privacy on Bitcoin transactions. See our [Silent Payments guide](https://docs.shakesco.com/silent-payments/ "silent-payments").
+4. **Send to Many** - ERC-4337 enables the `executeBatch` function. You can send money to multiple people at once.
 
-5. **Send to Many** - ERC-4337 enables the `executeBatch` function. You can send money to multiple people, or even privately send to multiple users at once.
-
-6. **Loyalty Program** - Businesses can deploy their own ERC-20 loyalty tokens with advanced features:
+5. **Loyalty Program** - Businesses can deploy their own ERC-20 loyalty tokens with advanced features:
 
    - **Token Creation** - Launch custom branded tokens
    - **Off-chain Management** - Customers don't need crypto wallets
@@ -155,20 +148,20 @@ _Here we cover the exciting features built by Shakesco._
 
    See our [Loyalty Program documentation](https://docs.shakesco.com/loyalty-program/ "loyalty-program").
 
-7. **Name Service** - We developed a built-in name service that enables anyone to register for free. It's a demand-based system rather than subscription-based. You can bid on usernames, preserve them, etc.
+6. **Name Service** - We developed a built-in name service that enables anyone to register for free. It's a demand-based system rather than subscription-based. You can bid on usernames, preserve them, etc.
 
-8. **Personal and Business Account Integration** - Open a personal wallet and then a business wallet and receive value in both. Seamlessly switch between personal and business contexts.
+7. **Personal and Business Account Integration** - Open a personal wallet and then a business wallet and receive value in both. Seamlessly switch between personal and business contexts.
 
-9. **Payment Links** - Create shareable payment links to accept one-time or recurring payments. Perfect for invoices, donations, or selling products.
+8. **Payment Links** - Create shareable payment links to accept one-time or recurring payments. Perfect for invoices, donations, or selling products.
 
-10. **Checkout Integration** - Integrate crypto checkout into your website or app with simple APIs.
+9. **Checkout Integration** - Integrate crypto checkout into your website or app with simple APIs.
 
-11. **Multi-Party Computation (MPC) Security** - Keys are distributed across multiple parties, ensuring no single point of failure. Enterprise-grade wallet security.
+10. **Multi-Party Computation (MPC) Security** - Keys are distributed across multiple parties, ensuring no single point of failure. Enterprise-grade wallet security.
 
-12. **Account Abstraction (ERC-4337)** - Gasless transactions, batch operations, and social recovery. Users don't need to manage gas fees or seed phrases.
+11. **Account Abstraction (ERC-4337)** - Gasless transactions, batch operations, and social recovery. Users don't need to manage gas fees or seed phrases.
 
-13. **Cross-Chain Support** - Support for Ethereum, Polygon, Arbitrum, Optimism, Base, BSC, and Bitcoin Lightning Network.
+12. **Cross-Chain Support** - Support for Ethereum, Polygon, Arbitrum, Optimism, Base, BSC, and Bitcoin Lightning Network.
 
-14. **Marketplace** - Built-in marketplace for businesses to auction loyalty tokens and NFTs to customers.
+13. **Marketplace** - Built-in marketplace for businesses to auction loyalty tokens and NFTs to customers.
 
-15. **Tokenized Stocks** - Buy and sell tokenized stocks from the same wallet. Stocks settle on BNB Smart Chain, where every wallet owner gets a dedicated stock account derived deterministically from their owner address. Payments and loyalty programs stay on Ethereum and Polygon.
+14. **Tokenized Stocks** - Buy and sell tokenized stocks from the same wallet. Stocks settle on BNB Smart Chain, where every wallet owner gets a dedicated stock account derived deterministically from their owner address. Payments and loyalty programs stay on Ethereum and Polygon.
