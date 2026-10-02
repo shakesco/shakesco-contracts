@@ -130,11 +130,9 @@ _Here we cover the exciting features built by Shakesco._
 
 2. **Recurring Payments on Ethereum** - We're excited about this! You can now perform auto-payments on Ethereum. Check out our [documentation](https://docs.shakesco.com/auto-payments/ "auto-payments") on how it works and how you can start receiving auto-payments.
 
-3. **Silent Payments** - Bitcoin Silent Payments implementation for enhanced privacy on Bitcoin transactions. See our [Silent Payments guide](https://docs.shakesco.com/silent-payments/ "silent-payments").
+3. **Send to Many** - ERC-4337 enables the `executeBatch` function. You can send money to multiple people at once.
 
-4. **Send to Many** - ERC-4337 enables the `executeBatch` function. You can send money to multiple people at once.
-
-5. **Loyalty Program** - Businesses can deploy their own ERC-20 loyalty tokens with advanced features:
+4. **Loyalty Program** - Businesses can deploy their own ERC-20 loyalty tokens with advanced features:
 
    - **Token Creation** - Launch custom branded tokens
    - **Off-chain Management** - Customers don't need crypto wallets
@@ -148,20 +146,20 @@ _Here we cover the exciting features built by Shakesco._
 
    See our [Loyalty Program documentation](https://docs.shakesco.com/loyalty-program/ "loyalty-program").
 
-6. **Name Service** - We developed a built-in name service that enables anyone to register for free. It's a demand-based system rather than subscription-based. You can bid on usernames, preserve them, etc.
+5. **Name Service** - We developed a built-in name service that enables anyone to register for free. It's a demand-based system rather than subscription-based. You can bid on usernames, preserve them, etc.
 
-7. **Personal and Business Account Integration** - Open a personal wallet and then a business wallet and receive value in both. Seamlessly switch between personal and business contexts.
+6. **Personal and Business Account Integration** - Open a personal wallet and then a business wallet and receive value in both. Seamlessly switch between personal and business contexts.
 
-8. **Payment Links** - Create shareable payment links to accept one-time or recurring payments. Perfect for invoices, donations, or selling products.
+7. **Payment Links** - Create shareable payment links to accept one-time or recurring payments. Perfect for invoices, donations, or selling products.
 
-9. **Checkout Integration** - Integrate crypto checkout into your website or app with simple APIs.
+8. **Checkout Integration** - Integrate crypto checkout into your website or app with simple APIs.
 
-10. **Multi-Party Computation (MPC) Security** - Keys are distributed across multiple parties, ensuring no single point of failure. Enterprise-grade wallet security.
+9. **Multi-Party Computation (MPC) Security** - Keys are distributed across multiple parties, ensuring no single point of failure. Enterprise-grade wallet security.
 
-11. **Account Abstraction (ERC-4337)** - Gasless transactions, batch operations, and social recovery. Users don't need to manage gas fees or seed phrases.
+10. **Account Abstraction (ERC-4337)** - Gasless transactions, batch operations, and social recovery. Users don't need to manage gas fees or seed phrases.
 
-12. **Cross-Chain Support** - Support for Ethereum, Polygon, Arbitrum, Optimism, Base, BSC, and Bitcoin Lightning Network.
+11. **Cross-Chain Support** - Support for Ethereum, Polygon, Arbitrum, Optimism, Base, BSC, and Bitcoin Lightning Network.
 
-13. **Marketplace** - Built-in marketplace for businesses to auction loyalty tokens and NFTs to customers.
+12. **Marketplace** - Built-in marketplace for businesses to auction loyalty tokens and NFTs to customers.
 
-14. **Tokenized Stocks** - Buy and sell tokenized stocks from the same wallet. Stocks settle on BNB Smart Chain, where every wallet owner gets a dedicated stock account derived deterministically from their owner address. Payments and loyalty programs stay on Ethereum and Polygon.
+13. **Tokenized Stocks** - Buy and sell tokenized stocks from the same wallet. Stocks settle on BNB Smart Chain, where every wallet owner gets a dedicated stock account derived deterministically from their owner address. Payments and loyalty programs stay on Ethereum and Polygon.
