@@ -54,8 +54,9 @@ contract ShakescoAccount is
     bool private s_acceptGroupInvite;
     //groups
     mapping(address => Group) private s_groups;
-    //split payment mapping for people allowed to pull from account
-    mapping(address => uint256) private s_splitPay;
+    //Retired split pay allowances. Split pay was removed, but the slot stays
+    //so upgraded accounts keep their storage layout. Never read or write it.
+    mapping(address => uint256) private s_retiredSplitPay;
     //Group array
     address[] private s_allGroups;
 
@@ -168,43 +169,6 @@ contract ShakescoAccount is
         return this.onERC721Received.selector;
     }
 
-    /**
-     * @dev The below function allows split payment
-     * @param puller The person allowed to pull from account
-     * @param amount The amount to pull from account
-     */
-    function acceptSplitPay(address puller, uint256 amount) external onlyOwner {
-        s_splitPay[puller] += amount;
-    }
-
-    /**
-     * @dev The below function removes split payment
-     * @param puller The person allowed to pull from account
-     */
-    function removeSplitPay(address puller) external onlyOwner {
-        s_splitPay[puller] = 0;
-    }
-
-    /**
-     * @dev The function below allows split payment to be used
-     * @param receiver The payee
-     * @param amount The amount
-     */
-    function pullSplitPay(address receiver, uint amount) external {
-        uint left = s_splitPay[msg.sender];
-        if (left == 0 || amount > left) {
-            revert ACCOUNT_TRANSACTIONFAILED();
-        }
-
-        s_splitPay[msg.sender] -= amount;
-
-        (bool success, ) = receiver.call{value: amount}("");
-
-        if (!success) {
-            revert ACCOUNT_TRANSACTIONFAILED();
-        }
-    }
-
     ////////////////////////////////////////
     ////////////ERC-4337 FUNCTIONS//////////
     ////////////////////////////////////////
@@ -264,10 +228,6 @@ contract ShakescoAccount is
     ////////////////////////////////////////
     ////////////GET FUNCTIONS///////////////
     ////////////////////////////////////////
-
-    function getSplitPay(address pay) external view returns (uint) {
-        return s_splitPay[pay];
-    }
 
     function entryPoint() public view virtual override returns (IEntryPoint) {
         return s_entryPoint;
