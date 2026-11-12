@@ -7,7 +7,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
   log("\n Deploying business account...");
 
-  let priceFeed = (await ethers.getContract("ShakescoFeedRegistry")).address;
+  let priceFeed = (await ethers.getContract("ShakescoRegistry")).address;
 
   await deploy("ShakescoBusinessContract", {
     from: deployer,

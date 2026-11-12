@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@account-abstraction/contracts/core/BaseAccount.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -26,6 +27,7 @@ using PriceConverter for uint256;
 
 contract ShakescoBusinessContract is
     IERC721Receiver,
+    IERC1271,
     ReentrancyGuard,
     BaseAccount,
     UUPSUpgradeable,
@@ -166,6 +168,32 @@ contract ShakescoBusinessContract is
     }
 
     /**
+     * @dev The functions below are called when the business receives ERC-1155
+     * tokens (prediction market outcome shares). Without them a safe transfer
+     * reverts.
+     */
+
+    function onERC1155Received(
+        address,
+        address,
+        uint256,
+        uint256,
+        bytes calldata
+    ) external pure returns (bytes4) {
+        return this.onERC1155Received.selector;
+    }
+
+    function onERC1155BatchReceived(
+        address,
+        address,
+        uint256[] calldata,
+        uint256[] calldata,
+        bytes calldata
+    ) external pure returns (bytes4) {
+        return this.onERC1155BatchReceived.selector;
+    }
+
+    /**
      * @dev The following function sets the nft address
      * @dev Called when they deploy nft/sbt contract so as to set address
      * @param nftAddress The nftAddress of the business that has employees.
@@ -238,6 +266,34 @@ contract ShakescoBusinessContract is
     }
 
     /**
+     * @notice ERC-1271 signature validation. Lets a service prove this business
+     *         smart account (not just the owner EOA) approved a message: the
+     *         owner signs the message and the service checks it against this
+     *         address.
+     * @dev The caller passes the same hash the signature was made over
+     *      (for a plain message that is the EIP-191 personal_sign digest,
+     *      e.g. ethers.hashMessage(message)). Returns the ERC-1271 magic value
+     *      when the recovered signer is the business owner, otherwise
+     *      0xffffffff. tryRecover is used so a malformed signature returns
+     *      invalid instead of reverting.
+     * @param hash Digest the signature was produced over
+     * @param signature Owner signature to verify
+     */
+    function isValidSignature(
+        bytes32 hash,
+        bytes memory signature
+    ) external view override returns (bytes4 magicValue) {
+        (address recovered, ECDSA.RecoverError error) = ECDSA.tryRecover(
+            hash,
+            signature
+        );
+        if (error == ECDSA.RecoverError.NoError && recovered == businessOwner) {
+            return IERC1271.isValidSignature.selector;
+        }
+        return 0xffffffff;
+    }
+
+    /**
      * @notice call operation
      * @param _to is supposed to send money to the address entered
      * @param _amount The amount to call execute with
@@ -287,6 +343,6 @@ contract ShakescoBusinessContract is
     }
 
     function version() external pure returns (uint256) {
-        return 5;
+        return 6;
     }
 }

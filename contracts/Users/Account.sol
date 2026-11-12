@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@account-abstraction/contracts/core/BaseAccount.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -34,6 +35,7 @@ using ECDSA for bytes32;
 
 contract ShakescoAccount is
     IERC721Receiver,
+    IERC1271,
     BaseAccount,
     ReentrancyGuard,
     UUPSUpgradeable,
@@ -169,6 +171,28 @@ contract ShakescoAccount is
         return this.onERC721Received.selector;
     }
 
+    /// @dev The functions below are called when owner receives ERC-1155 tokens
+    /// @dev (prediction market outcome shares). Without them a safe transfer reverts.
+    function onERC1155Received(
+        address,
+        address,
+        uint256,
+        uint256,
+        bytes calldata
+    ) external pure returns (bytes4) {
+        return this.onERC1155Received.selector;
+    }
+
+    function onERC1155BatchReceived(
+        address,
+        address,
+        uint256[] calldata,
+        uint256[] calldata,
+        bytes calldata
+    ) external pure returns (bytes4) {
+        return this.onERC1155BatchReceived.selector;
+    }
+
     ////////////////////////////////////////
     ////////////ERC-4337 FUNCTIONS//////////
     ////////////////////////////////////////
@@ -207,6 +231,35 @@ contract ShakescoAccount is
     }
 
     /**
+     * @notice ERC-1271 signature validation. Lets a service prove this smart
+     *         account (not just the owner EOA) approved a message: the owner
+     *         signs the message and the service checks it against this address.
+     * @dev The caller passes the same hash the signature was made over
+     *      (for a plain message that is the EIP-191 personal_sign digest,
+     *      e.g. ethers.hashMessage(message)). Returns the ERC-1271 magic value
+     *      when the recovered signer is the account owner, otherwise 0xffffffff.
+     *      tryRecover is used so a malformed signature returns invalid instead
+     *      of reverting.
+     * @param hash Digest the signature was produced over
+     * @param signature Owner signature to verify
+     */
+    function isValidSignature(
+        bytes32 hash,
+        bytes memory signature
+    ) external view override returns (bytes4 magicValue) {
+        (address recovered, ECDSA.RecoverError error) = ECDSA.tryRecover(
+            hash,
+            signature
+        );
+        if (
+            error == ECDSA.RecoverError.NoError && recovered == i_accountOwner
+        ) {
+            return IERC1271.isValidSignature.selector;
+        }
+        return 0xffffffff;
+    }
+
+    /**
      * @notice call operation
      * @param _to is supposed to send money to the address entered
      * @param _amount The amount to call execute with
@@ -234,6 +287,6 @@ contract ShakescoAccount is
     }
 
     function version() external pure returns (uint256) {
-        return 5;
+        return 6;
     }
 }

@@ -163,3 +163,7 @@ _Here we cover the exciting features built by Shakesco._
 12. **Marketplace** - Built-in marketplace for businesses to auction loyalty tokens and NFTs to customers.
 
 13. **Tokenized Stocks** - Buy and sell tokenized stocks from the same wallet. Stocks settle on BNB Smart Chain, where every wallet owner gets a dedicated stock account derived deterministically from their owner address. Payments and loyalty programs stay on Ethereum and Polygon.
+
+14. **Smart account signatures (ERC-1271)** - Personal and business accounts implement `isValidSignature`. A service can check a message or EIP-712 order against the smart account address, and the account returns the magic value when its owner key made the signature.
+
+15. **Prediction market shares (ERC-1155)** - Personal and business accounts implement `onERC1155Received` and `onERC1155BatchReceived`, so they can hold outcome shares. A safe transfer to an account without these hooks reverts.

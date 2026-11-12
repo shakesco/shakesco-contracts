@@ -7,7 +7,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   log("\n Deploying shakesco registry...");
   const arg = [CALLER];
 
-  const feedContract = await deploy("ShakescoFeedRegistry", {
+  const feedContract = await deploy("ShakescoRegistry", {
     from: deployer,
     args: arg,
     log: true,
