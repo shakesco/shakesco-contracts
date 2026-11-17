@@ -40,7 +40,6 @@ These contracts are deployed only on Polygon:
 | ---------------------------- | :----------------------------------------: |
 | ShakescoBusinessTokenFactory | 0xa171836571fffD542A02a9f9651D9c49595038DE |
 | ShakescoUsername             | 0xF5864038090Bd63F9b231087d571163269005b62 |
-| ShakescoTradeTokens          | 0x368214ae188430732FD23d4B938f342C39a28162 |
 | ShakescoManageTokens         | 0x8617a1F14f7684b73D6E205a7eC446851736e416 |
 
 ### BNB Smart Chain Only
